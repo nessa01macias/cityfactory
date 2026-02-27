@@ -1,0 +1,161 @@
+import { Link, useParams } from "react-router-dom";
+import { Card } from "../../components/ui/Card";
+import { Badge } from "../../components/ui/Badge";
+import { ButtonLink } from "../../components/ui/Button";
+import { getProjectBySlug } from "../../data/projects";
+import { formatDate } from "../../utils/format";
+import { statusToTone } from "../../utils/projectStatus";
+import "../page.css";
+
+function statusMeaning(status: string) {
+  switch (status) {
+    case "Idea":
+      return "A challenge or opportunity is identified.";
+    case "Research":
+      return "We gather data, talk to residents, and study options.";
+    case "Planning":
+      return "A proposal is developed and refined.";
+    case "Testing":
+      return "We pilot solutions in real neighborhoods.";
+    case "Implementation":
+      return "The solution is rolled out.";
+    case "Completed":
+      return "Work is completed and outcomes are shared.";
+    default:
+      return "";
+  }
+}
+
+export function ProjectDetailPage() {
+  const { slug } = useParams();
+  const project = slug ? getProjectBySlug(slug) : undefined;
+
+  if (!project) {
+    return (
+      <section className="cf-section">
+        <div className="cf-container">
+          <div className="cf-alert cf-alert--error">
+            Project not found. <Link to="/projects">Back to projects</Link>
+          </div>
+        </div>
+      </section>
+    );
+  }
+
+  return (
+    <>
+      <section className="cf-hero">
+        <div className="cf-container cf-hero__inner">
+          <div>
+            <Link to="/projects" style={{ color: "rgba(255,255,255,0.7)", fontSize: "0.925rem" }}>
+              &larr; Back to projects
+            </Link>
+          </div>
+          <h1 className="cf-h1">{project.title}</h1>
+          <div style={{ display: "flex", gap: "0.5rem", flexWrap: "wrap", alignItems: "center" }}>
+            <Badge tone={statusToTone(project.status)}>{project.status}</Badge>
+            <span
+              style={{
+                display: "inline-flex",
+                padding: "0.2rem 0.55rem",
+                borderRadius: "var(--cf-radius-full)",
+                background: "rgba(255,255,255,0.15)",
+                color: "#fff",
+                fontWeight: 600,
+                fontSize: "0.8rem"
+              }}
+            >
+              {project.area}
+            </span>
+            {project.topics.map((t) => (
+              <span
+                key={t}
+                style={{
+                  display: "inline-flex",
+                  padding: "0.2rem 0.55rem",
+                  borderRadius: "var(--cf-radius-full)",
+                  background: "rgba(255,255,255,0.1)",
+                  color: "rgba(255,255,255,0.8)",
+                  fontWeight: 600,
+                  fontSize: "0.8rem"
+                }}
+              >
+                {t}
+              </span>
+            ))}
+          </div>
+          <p className="cf-lead">{project.description}</p>
+        </div>
+      </section>
+
+      <section className="cf-section">
+        <div className="cf-container">
+          <div className="cf-grid cf-grid--2">
+            <Card>
+              <div className="cf-card__title">Status</div>
+              <div className="cf-card__meta" style={{ marginBottom: "0.75rem" }}>
+                Updated {formatDate(project.lastUpdated)}
+              </div>
+              <p style={{ margin: 0, lineHeight: 1.6 }}>
+                <strong>{project.status}:</strong> {statusMeaning(project.status)}
+              </p>
+            </Card>
+
+            <Card>
+              <div className="cf-card__title">Who's involved</div>
+              <div className="cf-card__meta">City teams and partners working together</div>
+              <ul style={{ margin: 0, paddingLeft: "1.2rem", lineHeight: 1.7 }}>
+                {project.team.map((t) => (
+                  <li key={t}>{t}</li>
+                ))}
+              </ul>
+            </Card>
+          </div>
+
+          <div style={{ height: "1.5rem" }} />
+
+          <Card>
+            <div className="cf-card__title">About this project</div>
+            <div style={{ height: "0.5rem" }} />
+            {project.body.map((p, i) => (
+              <p key={i} style={{ margin: i === project.body.length - 1 ? 0 : "0 0 1rem", lineHeight: 1.65 }}>
+                {p}
+              </p>
+            ))}
+          </Card>
+
+          <div style={{ height: "1.5rem" }} />
+
+          <div className="cf-grid cf-grid--2">
+            <Card>
+              <div className="cf-card__title">Timeline</div>
+              <div className="cf-card__meta">Key milestones</div>
+              <ul style={{ margin: 0, paddingLeft: "1.2rem", lineHeight: 1.7 }}>
+                {project.milestones.map((m) => (
+                  <li key={`${m.date}-${m.label}`}>
+                    <strong>{formatDate(m.date)}:</strong> {m.label}
+                  </li>
+                ))}
+              </ul>
+            </Card>
+
+            <Card className="cf-card--blue">
+              <div className="cf-card__title">How to give feedback</div>
+              <p className="cf-card__meta" style={{ marginBottom: "0.75rem" }}>
+                Your experience matters — especially local details that don't show up in maps or reports.
+              </p>
+              <div className="cf-actions" style={{ marginTop: 0 }}>
+                <ButtonLink to="/feedback">
+                  Share feedback on this project
+                </ButtonLink>
+                <ButtonLink to="/contact" variant="ghost">
+                  Contact City Factory
+                </ButtonLink>
+              </div>
+            </Card>
+          </div>
+        </div>
+      </section>
+    </>
+  );
+}

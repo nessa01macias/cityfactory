@@ -1,0 +1,119 @@
+import { useEffect, useMemo, useState } from "react";
+import { Card } from "../../components/ui/Card";
+import { Button } from "../../components/ui/Button";
+import { findByReference, normalizeReference } from "../../storage/feedback";
+import { formatDateTime } from "../../utils/format";
+import "../page.css";
+
+export function FeedbackStatusPage() {
+  const initialRef = useMemo(() => {
+    const u = new URL(window.location.href);
+    return u.searchParams.get("ref") || "";
+  }, []);
+
+  const [ref, setRef] = useState(initialRef);
+  const [error, setError] = useState<string | null>(null);
+  const [result, setResult] = useState<ReturnType<typeof findByReference>>(null);
+
+  const lookup = (reference: string) => {
+    setError(null);
+    const norm = normalizeReference(reference);
+    if (!norm) {
+      setError("Enter a reference number (for example, #CF-20240301-1234).");
+      setResult(null);
+      return;
+    }
+    const found = findByReference(norm);
+    if (!found) {
+      setError("We couldn’t find that reference number on this device.");
+      setResult(null);
+      return;
+    }
+    setResult(found);
+  };
+
+  useEffect(() => {
+    if (initialRef.trim()) lookup(initialRef);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  return (
+    <>
+      <section className="cf-hero">
+        <div className="cf-container cf-hero__inner">
+          <h1 className="cf-h1">Check Submission Status</h1>
+          <p className="cf-lead">
+            Enter your reference number (for example, #CF-20240301-1234). For this MVP prototype, submissions are stored
+            locally in your browser.
+          </p>
+        </div>
+      </section>
+
+      <section className="cf-section">
+        <div className="cf-container">
+          <div className="cf-grid cf-grid--2" style={{ alignItems: "start" }}>
+            <Card>
+              <div className="cf-card__title">Lookup</div>
+              <form
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  lookup(ref);
+                }}
+                className="cf-grid"
+                style={{ gap: "0.75rem", marginTop: "0.75rem" }}
+              >
+                <div className="cf-field">
+                  <label className="cf-label" htmlFor="ref">
+                    Reference number
+                  </label>
+                  <input
+                    id="ref"
+                    className="cf-input"
+                    value={ref}
+                    onChange={(e) => setRef(e.target.value)}
+                    placeholder="#CF-20240301-1234"
+                  />
+                </div>
+                <Button type="submit">Check status</Button>
+              </form>
+              {error ? <div className="cf-alert cf-alert--error" style={{ marginTop: "0.75rem" }}>{error}</div> : null}
+            </Card>
+
+            <Card>
+              <div className="cf-card__title">Status</div>
+              {result ? (
+                <div className="cf-list" style={{ marginTop: "0.75rem" }}>
+                  <div>
+                    <strong>Reference:</strong> #{normalizeReference(result.reference)}
+                  </div>
+                  <div>
+                    <strong>Date submitted:</strong> {formatDateTime(result.createdAt)}
+                  </div>
+                  <div>
+                    <strong>Type:</strong> {result.type}
+                  </div>
+                  <div>
+                    <strong>Current status:</strong> {result.status}
+                  </div>
+                  <div>
+                    <strong>Last updated:</strong> {formatDateTime(result.lastUpdatedAt)}
+                  </div>
+                  {result.publicNotes ? (
+                    <div>
+                      <strong>Notes:</strong> {result.publicNotes}
+                    </div>
+                  ) : null}
+                </div>
+              ) : (
+                <p className="cf-card__meta" style={{ marginTop: "0.75rem" }}>
+                  Enter a reference number to see details.
+                </p>
+              )}
+            </Card>
+          </div>
+        </div>
+      </section>
+    </>
+  );
+}
+

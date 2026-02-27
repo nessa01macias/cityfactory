@@ -1,0 +1,337 @@
+/* ============================================================
+   Header
+   ============================================================ */
+
+.cf-header {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: rgba(255, 255, 255, 0.97);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--cf-border-light);
+  height: var(--cf-header-height);
+  display: flex;
+  align-items: center;
+}
+
+.cf-header__inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.5rem;
+  width: 100%;
+}
+
+/* Brand / Logo */
+.cf-brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.7rem;
+  color: var(--cf-text);
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.cf-brand:hover {
+  text-decoration: none;
+  color: var(--cf-primary);
+}
+
+.cf-brand__mark {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: var(--espoo-blue);
+  color: #fff;
+  flex-shrink: 0;
+  box-shadow: 0 2px 8px rgba(0, 80, 187, 0.25);
+}
+
+.cf-brand__mark svg {
+  width: 34px;
+  height: 34px;
+}
+
+.cf-brand__text {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.15;
+}
+
+.cf-brand__name {
+  font-weight: 800;
+  font-size: 1.1rem;
+  letter-spacing: -0.01em;
+}
+
+.cf-brand__sub {
+  font-weight: 700;
+  font-size: 0.65rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  opacity: 0.5;
+}
+
+/* Desktop Nav */
+.cf-nav {
+  display: none;
+  align-items: center;
+  gap: 0.15rem;
+}
+
+.cf-nav a {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.5rem 0.85rem;
+  border-radius: var(--cf-radius-full);
+  color: var(--cf-text-secondary);
+  font-weight: 600;
+  font-size: 0.925rem;
+  text-decoration: none;
+  transition: all var(--cf-transition);
+}
+
+.cf-nav a:hover {
+  color: var(--cf-text);
+  background: var(--cf-surface);
+  text-decoration: none;
+}
+
+.cf-nav a[aria-current="page"] {
+  background: var(--cf-primary-light);
+  color: var(--cf-primary);
+  text-decoration: none;
+  font-weight: 700;
+}
+
+/* Header Actions */
+.cf-header__actions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.cf-iconbtn {
+  appearance: none;
+  border: 1px solid var(--cf-border);
+  background: var(--cf-bg);
+  border-radius: var(--cf-radius);
+  padding: 0.5rem 0.75rem;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 0.875rem;
+  color: var(--cf-text-secondary);
+  transition: all var(--cf-transition);
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.cf-iconbtn:hover {
+  border-color: var(--cf-primary);
+  color: var(--cf-primary);
+  background: var(--cf-primary-subtle);
+}
+
+/* Mobile Menu */
+.cf-mobileMenu {
+  position: absolute;
+  top: var(--cf-header-height);
+  left: 0;
+  right: 0;
+  background: var(--cf-bg);
+  border-bottom: 1px solid var(--cf-border);
+  box-shadow: var(--cf-shadow-md);
+  animation: cf-slideDown 200ms ease-out;
+}
+
+@keyframes cf-slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.cf-mobileMenu__inner {
+  padding: 0.75rem 0 1.25rem;
+  display: grid;
+  gap: 0.25rem;
+}
+
+.cf-mobileMenu a {
+  padding: 0.8rem 1rem;
+  border-radius: var(--cf-radius);
+  font-weight: 600;
+  color: var(--cf-text);
+  text-decoration: none;
+  transition: background var(--cf-transition);
+}
+
+.cf-mobileMenu a:hover {
+  background: var(--cf-surface);
+  text-decoration: none;
+}
+
+.cf-mobileMenu a[aria-current="page"] {
+  background: var(--cf-primary-light);
+  color: var(--cf-primary);
+  text-decoration: none;
+  font-weight: 700;
+}
+
+/* ============================================================
+   Main Content
+   ============================================================ */
+
+.cf-main {
+  min-height: calc(100vh - var(--cf-header-height) - 200px);
+}
+
+/* ============================================================
+   Footer
+   ============================================================ */
+
+.cf-footer {
+  background: var(--espoo-night);
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.cf-footer__inner {
+  padding: 3.5rem 0 2.5rem;
+  display: grid;
+  gap: 2rem;
+}
+
+.cf-footer__top {
+  display: grid;
+  gap: 2rem;
+}
+
+@media (min-width: 640px) {
+  .cf-footer__top {
+    grid-template-columns: 1fr 2fr;
+    gap: 3rem;
+  }
+}
+
+.cf-footer .cf-brand {
+  color: #fff;
+}
+
+.cf-footer .cf-brand:hover {
+  color: var(--espoo-sunflower);
+}
+
+.cf-footer .cf-brand__mark {
+  background: rgba(255, 255, 255, 0.12);
+  box-shadow: none;
+}
+
+.cf-footer .cf-brand__sub {
+  color: rgba(255, 255, 255, 0.4);
+  opacity: 1;
+}
+
+.cf-footer__desc {
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 0.925rem;
+  line-height: 1.55;
+  margin: 0.75rem 0 0;
+  max-width: 32ch;
+}
+
+.cf-footer__links-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1.5rem;
+}
+
+@media (min-width: 640px) {
+  .cf-footer__links-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.cf-footer__links-heading {
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: rgba(255, 255, 255, 0.5);
+  margin: 0 0 0.75rem;
+}
+
+.cf-footer__links {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.cf-footer__links a {
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 0.925rem;
+  text-decoration: none;
+  transition: color var(--cf-transition);
+}
+
+.cf-footer__links a:hover {
+  color: #fff;
+  text-decoration: none;
+}
+
+.cf-footer__links a[aria-current="page"] {
+  color: #fff;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.cf-footer__divider {
+  border: none;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  margin: 0;
+}
+
+.cf-footer__bottom {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 1.5rem;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.cf-footer__meta {
+  color: rgba(255, 255, 255, 0.45);
+  font-size: 0.85rem;
+}
+
+.cf-footer__meta a {
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.cf-footer__meta a:hover {
+  color: #fff;
+}
+
+/* ============================================================
+   Responsive
+   ============================================================ */
+
+@media (min-width: 860px) {
+  .cf-nav {
+    display: flex;
+  }
+  .cf-header__burger {
+    display: none;
+  }
+  .cf-mobileMenu {
+    display: none;
+  }
+}

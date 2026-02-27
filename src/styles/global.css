@@ -1,0 +1,193 @@
+/* ============================================================
+   City Factory — Design System
+   Official Espoo Brand Colors + Modern Layout
+   ============================================================ */
+
+:root {
+  /* Typography */
+  --cf-font-sans: "Segoe UI", system-ui, -apple-system, Roboto, "Helvetica Neue",
+    Arial, "Noto Sans", "Liberation Sans", sans-serif;
+
+  /* ── Official Espoo Brand Colors ── */
+  --espoo-blue:       #0050BB;
+  --espoo-night:      #012169;
+  --espoo-lilac:      #9D85E5;
+  --espoo-berry:      #FCA5C7;
+  --espoo-strawberry: #FF4F57;
+  --espoo-powder:     #FDE6DB;
+  --espoo-peach:      #FFC386;
+  --espoo-sunflower:  #FFDC47;
+  --espoo-grass:      #8AC987;
+  --espoo-pine:       #24573C;
+  --espoo-rock:       #DFE5EB;
+
+  /* ── Semantic Aliases ── */
+  --cf-primary: var(--espoo-blue);
+  --cf-primary-hover: var(--espoo-night);
+  --cf-primary-light: #e8f1fc;
+  --cf-primary-subtle: #f3f8ff;
+
+  /* Neutrals */
+  --cf-text: #0a1628;
+  --cf-text-secondary: #3d4f6f;
+  --cf-text-muted: #7b8da6;
+  --cf-bg: #ffffff;
+  --cf-surface: #f5f7fa;
+  --cf-surface-raised: #ffffff;
+  --cf-border: #dfe5ec;
+  --cf-border-light: #eef1f5;
+
+  /* Focus */
+  --cf-focus: var(--espoo-blue);
+  --cf-focus-ring: rgba(0, 80, 187, 0.3);
+
+  /* Status */
+  --cf-success: #0d7a3e;
+  --cf-success-light: #e6f9ee;
+  --cf-warning: #c05621;
+  --cf-warning-light: #fff8f0;
+  --cf-error: #dc2626;
+  --cf-error-light: #fff5f5;
+  --cf-info: var(--espoo-blue);
+  --cf-info-light: #f3f8ff;
+
+  /* Shapes */
+  --cf-radius-sm: 8px;
+  --cf-radius: 12px;
+  --cf-radius-lg: 16px;
+  --cf-radius-xl: 24px;
+  --cf-radius-full: 999px;
+
+  /* Shadows */
+  --cf-shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.05);
+  --cf-shadow: 0 4px 20px rgba(1, 33, 105, 0.07);
+  --cf-shadow-md: 0 8px 32px rgba(1, 33, 105, 0.09);
+  --cf-shadow-lg: 0 20px 60px rgba(1, 33, 105, 0.12);
+  --cf-shadow-card-hover: 0 12px 40px rgba(1, 33, 105, 0.15);
+
+  /* Layout */
+  --cf-container: 1200px;
+  --cf-header-height: 72px;
+
+  /* Motion */
+  --cf-transition: 200ms cubic-bezier(0.4, 0, 0.2, 1);
+  --cf-transition-slow: 400ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* ============================================================
+   Reset & Base
+   ============================================================ */
+
+*, *::before, *::after { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+html, body { height: 100%; }
+
+body {
+  margin: 0;
+  font-family: var(--cf-font-sans);
+  color: var(--cf-text);
+  background: var(--cf-bg);
+  font-size: 16px;
+  line-height: 1.6;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow-x: hidden;
+}
+
+a {
+  color: var(--cf-primary);
+  text-decoration: none;
+  transition: color var(--cf-transition);
+}
+a:hover {
+  color: var(--cf-primary-hover);
+  text-decoration: underline;
+}
+
+:focus-visible {
+  outline: 3px solid var(--cf-focus-ring);
+  outline-offset: 2px;
+}
+
+img { max-width: 100%; height: auto; }
+button, input, select, textarea { font: inherit; }
+
+/* ============================================================
+   Layout Utilities
+   ============================================================ */
+
+.cf-container {
+  width: min(var(--cf-container), calc(100% - 2.5rem));
+  margin: 0 auto;
+}
+
+.cf-section {
+  padding: 5rem 0;
+  position: relative;
+}
+
+.cf-section--muted { background: var(--cf-surface); }
+.cf-section--blue { background: var(--espoo-blue); color: #fff; }
+.cf-section--night { background: var(--espoo-night); color: #fff; }
+.cf-section--powder { background: var(--espoo-powder); }
+
+/* ============================================================
+   Typography
+   ============================================================ */
+
+.cf-h1 {
+  font-size: clamp(2.2rem, 4.5vw, 3.75rem);
+  line-height: 1.08;
+  margin: 0 0 0.75rem;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+}
+
+.cf-h2 {
+  font-size: clamp(1.6rem, 2.5vw, 2.5rem);
+  line-height: 1.15;
+  margin: 0 0 0.75rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+
+.cf-h3 {
+  font-size: 1.3rem;
+  line-height: 1.25;
+  margin: 0 0 0.5rem;
+  font-weight: 700;
+}
+
+.cf-lead {
+  font-size: 1.15rem;
+  color: var(--cf-text-secondary);
+  max-width: 62ch;
+  margin: 0;
+  line-height: 1.7;
+}
+
+.cf-lead--light { color: rgba(255, 255, 255, 0.85); }
+
+.cf-overline {
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--cf-text-muted);
+  margin: 0 0 0.5rem;
+}
+
+/* ============================================================
+   Grid
+   ============================================================ */
+
+.cf-grid { display: grid; gap: 1.5rem; }
+
+@media (min-width: 640px) {
+  .cf-grid--2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+@media (min-width: 860px) {
+  .cf-grid--3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
