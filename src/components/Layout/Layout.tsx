@@ -10,6 +10,7 @@ const NAV_ITEMS: NavItem[] = [
   { to: "/events", label: "Events" },
   { to: "/projects", label: "Projects" },
   { to: "/get-involved", label: "Get Involved" },
+  { to: "/facilities", label: "Facilities" },
   { to: "/feedback", label: "Feedback" },
   { to: "/contact", label: "Contact" }
 ];

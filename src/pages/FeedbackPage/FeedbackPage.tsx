@@ -1,7 +1,8 @@
 import { useMemo, useState, type FormEvent } from "react";
 import { Button } from "../../components/ui/Button";
 import { Card } from "../../components/ui/Card";
-import { normalizeReference, generateReference, saveSubmission, type FeedbackSubmission, type FeedbackType } from "../../storage/feedback";
+import { supabase } from "../../supabaseClient";
+import { normalizeReference, generateReference, type FeedbackSubmission, type FeedbackType } from "../../storage/feedback";
 import "../page.css";
 
 const TOPICS = [
@@ -93,7 +94,7 @@ export function FeedbackPage() {
     setTopics((prev) => (prev.includes(t) ? prev.filter((x) => x !== t) : [...prev, t]));
   };
 
-  const submit = (e: FormEvent<HTMLFormElement>) => {
+  const submit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setError(null);
 
@@ -124,7 +125,26 @@ export function FeedbackPage() {
       publicNotes: null
     };
 
-    saveSubmission(submission);
+    const { error: dbError } = await supabase.from("feedback").insert({
+      reference: submission.reference,
+      created_at: submission.createdAt,
+      last_updated_at: submission.lastUpdatedAt,
+      type: submission.type,
+      topics: submission.topics,
+      area: submission.area,
+      area_other: submission.areaOther,
+      message: submission.message,
+      email: submission.email,
+      name: submission.name,
+      status: submission.status,
+      public_notes: submission.publicNotes
+    });
+
+    if (dbError) {
+      setError("We couldn't save your feedback right now. Please try again.");
+      return;
+    }
+
     setSubmitted(submission);
   };
 
