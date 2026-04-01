@@ -59,15 +59,6 @@ export function FeedbackStatusPage() {
     setResult(rowToSubmission(data));
   };
 
-  const _removed = () => {
-    if (!found) {
-      setError("We couldn’t find that reference number on this device.");
-      setResult(null);
-      return;
-    }
-    setResult(found);
-  };
-
   useEffect(() => {
     if (initialRef.trim()) void lookup(initialRef);
     // eslint-disable-next-line react-hooks/exhaustive-deps

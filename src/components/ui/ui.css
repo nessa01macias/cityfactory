@@ -188,6 +188,36 @@
   border-color: #86efac;
 }
 
+.cf-badge--espoo {
+  background: var(--cf-primary-light);
+  color: var(--espoo-blue);
+  border-color: #b8d4fe;
+}
+
+.cf-badge--helsinki {
+  background: #fef3c7;
+  color: #92400e;
+  border-color: #fcd34d;
+}
+
+.cf-badge--vantaa {
+  background: #ede9fe;
+  color: #5b21b6;
+  border-color: #c4b5fd;
+}
+
+.cf-badge--source-espoo {
+  background: var(--cf-primary-light);
+  color: var(--espoo-blue);
+  border-color: #b8d4fe;
+}
+
+.cf-badge--source-helsinki {
+  background: #fef3c7;
+  color: #92400e;
+  border-color: #fcd34d;
+}
+
 /* ============================================================
    Form Elements
    ============================================================ */

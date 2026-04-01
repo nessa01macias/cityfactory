@@ -1,8 +1,8 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Card } from "../../components/ui/Card";
 import { Badge } from "../../components/ui/Badge";
 import { ButtonLink } from "../../components/ui/Button";
-import { PROJECTS, type ProjectStatus } from "../../data/projects";
+import { fetchAllProjects, type Project, type ProjectStatus } from "../../api/projects";
 import { formatDate, truncate } from "../../utils/format";
 import { statusToTone } from "../../utils/projectStatus";
 import "../page.css";
@@ -17,6 +17,12 @@ const STATUSES: (ProjectStatus | "All")[] = [
   "Completed"
 ];
 
+const SOURCE_OPTIONS = [
+  { value: "all", label: "All sources" },
+  { value: "espoo", label: "Espoo (City Factory)" },
+  { value: "helsinki", label: "Helsinki (Kerrokantasi)" },
+] as const;
+
 const PIPELINE_STAGES = [
   { num: 1, label: "Idea" },
   { num: 2, label: "Research" },
@@ -27,30 +33,48 @@ const PIPELINE_STAGES = [
 ];
 
 export function ProjectsPage() {
+  const [projects, setProjects] = useState<Project[] | null>(null);
+  const [error, setError] = useState<string | null>(null);
   const [status, setStatus] = useState<(typeof STATUSES)[number]>("All");
   const [topic, setTopic] = useState<string>("All");
   const [area, setArea] = useState<string>("All");
+  const [source, setSource] = useState<string>("all");
+
+  useEffect(() => {
+    const ac = new AbortController();
+    fetchAllProjects({ signal: ac.signal })
+      .then(setProjects)
+      .catch((e: unknown) => {
+        if ((e as { name?: string })?.name === "AbortError") return;
+        setError("We couldn't load projects right now. Please try again soon.");
+      });
+    return () => ac.abort();
+  }, []);
 
   const topics = useMemo(() => {
+    if (!projects) return ["All"];
     const set = new Set<string>();
-    for (const p of PROJECTS) for (const t of p.topics) set.add(t);
+    for (const p of projects) for (const t of p.topics) set.add(t);
     return ["All", ...Array.from(set).sort((a, b) => a.localeCompare(b))];
-  }, []);
+  }, [projects]);
 
   const areas = useMemo(() => {
+    if (!projects) return ["All"];
     const set = new Set<string>();
-    for (const p of PROJECTS) set.add(p.area);
+    for (const p of projects) set.add(p.area);
     return ["All", ...Array.from(set).sort((a, b) => a.localeCompare(b))];
-  }, []);
+  }, [projects]);
 
   const filtered = useMemo(() => {
-    return PROJECTS.filter((p) => {
+    if (!projects) return null;
+    return projects.filter((p) => {
       if (status !== "All" && p.status !== status) return false;
       if (topic !== "All" && !p.topics.includes(topic)) return false;
       if (area !== "All" && p.area !== area) return false;
+      if (source !== "all" && p.source !== source) return false;
       return true;
     });
-  }, [status, topic, area]);
+  }, [projects, status, topic, area, source]);
 
   return (
     <>
@@ -58,8 +82,8 @@ export function ProjectsPage() {
         <div className="cf-container cf-hero__inner">
           <h1 className="cf-h1">Projects</h1>
           <p className="cf-lead">
-            What is the City of Espoo working on right now? Here you can see city projects at every stage — from early
-            ideas to completed work. We believe transparency builds trust.
+            See what cities across the Helsinki metropolitan area are working on — from early ideas to completed work.
+            Projects from Espoo and Helsinki participation hearings, all in one place.
           </p>
         </div>
       </section>
@@ -90,40 +114,38 @@ export function ProjectsPage() {
           <div style={{ height: "2rem" }} />
 
           <h2 className="cf-h2">Browse projects</h2>
-          <div className="cf-grid cf-grid--3">
+          <div className="cf-grid cf-grid--2" style={{ marginBottom: "0.5rem" }}>
             <div className="cf-field">
-              <label className="cf-label" htmlFor="status">
-                Status
-              </label>
+              <label className="cf-label" htmlFor="source">Source</label>
+              <select className="cf-select" id="source" value={source} onChange={(e) => setSource(e.target.value)}>
+                {SOURCE_OPTIONS.map((s) => (
+                  <option key={s.value} value={s.value}>{s.label}</option>
+                ))}
+              </select>
+            </div>
+            <div className="cf-field">
+              <label className="cf-label" htmlFor="status">Status</label>
               <select className="cf-select" id="status" value={status} onChange={(e) => setStatus(e.target.value as typeof status)}>
                 {STATUSES.map((s) => (
-                  <option key={s} value={s}>
-                    {s}
-                  </option>
+                  <option key={s} value={s}>{s}</option>
                 ))}
               </select>
             </div>
+          </div>
+          <div className="cf-grid cf-grid--2">
             <div className="cf-field">
-              <label className="cf-label" htmlFor="topic">
-                Topic
-              </label>
+              <label className="cf-label" htmlFor="topic">Topic</label>
               <select className="cf-select" id="topic" value={topic} onChange={(e) => setTopic(e.target.value)}>
                 {topics.map((t) => (
-                  <option key={t} value={t}>
-                    {t}
-                  </option>
+                  <option key={t} value={t}>{t}</option>
                 ))}
               </select>
             </div>
             <div className="cf-field">
-              <label className="cf-label" htmlFor="area">
-                Area
-              </label>
+              <label className="cf-label" htmlFor="area">Area</label>
               <select className="cf-select" id="area" value={area} onChange={(e) => setArea(e.target.value)}>
                 {areas.map((a) => (
-                  <option key={a} value={a}>
-                    {a}
-                  </option>
+                  <option key={a} value={a}>{a}</option>
                 ))}
               </select>
             </div>
@@ -131,32 +153,57 @@ export function ProjectsPage() {
 
           <div style={{ height: "1.5rem" }} />
 
+          {error ? <div className="cf-alert cf-alert--error">{error}</div> : null}
+
           <div className="cf-grid cf-grid--3">
-            {filtered.map((p) => (
-              <Card key={p.slug}>
-                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: "0.5rem", marginBottom: "0.5rem" }}>
-                  <Badge tone={statusToTone(p.status)}>{p.status}</Badge>
-                  <span style={{ fontSize: "0.8rem", color: "var(--cf-text-muted)" }}>
-                    {p.area} &middot; {formatDate(p.lastUpdated)}
-                  </span>
-                </div>
-                <div className="cf-card__title">{p.title}</div>
-                <div className="cf-tags" style={{ margin: "0.35rem 0 0.5rem" }}>
-                  {p.topics.map((t) => (
-                    <span key={t} className="cf-tag">
-                      {t}
-                    </span>
-                  ))}
-                </div>
-                <p style={{ margin: "0 0 0.75rem", color: "var(--cf-text-secondary)", fontSize: "0.925rem" }}>{truncate(p.description, 150)}</p>
-                <ButtonLink to={`/projects/${p.slug}`} variant="ghost" style={{ padding: "0.5rem 0" }}>
-                  Learn more &rarr;
-                </ButtonLink>
-              </Card>
-            ))}
+            {(filtered ?? Array.from({ length: 6 }).map(() => null)).map((p, idx) => {
+              if (!p) {
+                return (
+                  <Card key={`skeleton-${idx}`}>
+                    <div className="cf-skeleton cf-skeleton--title" style={{ marginBottom: "0.5rem" }} />
+                    <div className="cf-skeleton cf-skeleton--text" style={{ marginBottom: "0.35rem" }} />
+                    <div className="cf-skeleton cf-skeleton--text" style={{ width: "60%" }} />
+                  </Card>
+                );
+              }
+
+              return (
+                <Card key={p.slug}>
+                  {p.imageUrl ? (
+                    <img src={p.imageUrl} alt="" className="cf-card__img" loading="lazy" />
+                  ) : null}
+                  <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: "0.5rem", marginBottom: "0.5rem" }}>
+                    <Badge tone={statusToTone(p.status)}>{p.status}</Badge>
+                    <div style={{ display: "flex", alignItems: "center", gap: "0.4rem" }}>
+                      <Badge tone={`source-${p.source}`}>{p.source === "espoo" ? "Espoo" : "Helsinki"}</Badge>
+                      <span style={{ fontSize: "0.8rem", color: "var(--cf-text-muted)" }}>
+                        {p.area}
+                      </span>
+                    </div>
+                  </div>
+                  <div className="cf-card__title">{p.title}</div>
+                  <div className="cf-tags" style={{ margin: "0.35rem 0 0.5rem" }}>
+                    {p.topics.slice(0, 3).map((t) => (
+                      <span key={t} className="cf-tag">{t}</span>
+                    ))}
+                  </div>
+                  <p style={{ margin: "0 0 0.75rem", color: "var(--cf-text-secondary)", fontSize: "0.925rem" }}>{truncate(p.description, 150)}</p>
+                  <div style={{ display: "flex", gap: "0.5rem", alignItems: "center" }}>
+                    <ButtonLink to={`/projects/${p.slug}`} variant="ghost" style={{ padding: "0.5rem 0" }}>
+                      Learn more &rarr;
+                    </ButtonLink>
+                    {p.externalUrl ? (
+                      <a href={p.externalUrl} target="_blank" rel="noreferrer" style={{ fontSize: "0.85rem", color: "var(--cf-primary)" }}>
+                        External link &rarr;
+                      </a>
+                    ) : null}
+                  </div>
+                </Card>
+              );
+            })}
           </div>
 
-          {filtered.length === 0 ? (
+          {filtered && filtered.length === 0 ? (
             <div className="cf-alert cf-alert--info" style={{ marginTop: "1.5rem" }}>
               No projects matched those filters.
             </div>

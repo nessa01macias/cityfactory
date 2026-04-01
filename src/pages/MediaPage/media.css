@@ -1,0 +1,532 @@
+/* ============================================================
+   Voice Map — Full-page Queering-the-Map style layout
+   ============================================================ */
+
+.cf-voicemap-page {
+  display: flex;
+  flex-direction: column;
+  height: calc(100vh - var(--cf-header-height));
+  /* Prevent iOS safari bounce / address bar weirdness */
+  height: calc(100dvh - var(--cf-header-height));
+  overflow: hidden;
+}
+
+.cf-voicemap-page__hero {
+  background: var(--espoo-blue);
+  color: #fff;
+  padding: 1rem 1.5rem;
+  text-align: center;
+  flex-shrink: 0;
+}
+
+.cf-voicemap-page__title {
+  font-size: 1.25rem;
+  font-weight: 800;
+  margin: 0;
+  letter-spacing: -0.02em;
+}
+
+.cf-voicemap-page__subtitle {
+  font-size: 0.9rem;
+  margin: 0.25rem 0 0;
+  opacity: 0.85;
+  max-width: 60ch;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.cf-voicemap-page__mock-badge {
+  display: inline-block;
+  margin-top: 0.6rem;
+  padding: 0.3rem 0.9rem;
+  background: rgba(255, 220, 71, 0.2);
+  color: var(--espoo-sunflower);
+  border: 1px solid rgba(255, 220, 71, 0.4);
+  border-radius: var(--cf-radius-full);
+  font-size: 0.8rem;
+  font-weight: 650;
+  letter-spacing: 0.01em;
+}
+
+/* ── Map + panel container ── */
+.cf-voicemap {
+  flex: 1;
+  display: flex;
+  position: relative;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.cf-voicemap__map {
+  flex: 1;
+  position: relative;
+  min-height: 0;
+  /* Ensure map fills on mobile even when panel is open */
+  min-width: 0;
+}
+
+/* ── Toast notifications ── */
+.cf-voicemap__toast {
+  position: absolute;
+  z-index: 1000;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 0.5rem 1.25rem;
+  border-radius: var(--cf-radius-full);
+  font-size: 0.85rem;
+  font-weight: 600;
+  white-space: nowrap;
+  pointer-events: none;
+}
+
+.cf-voicemap__toast--top {
+  top: 1rem;
+  background: rgba(0, 0, 0, 0.8);
+  color: #fff;
+}
+
+.cf-voicemap__toast--success {
+  bottom: 5rem;
+  background: var(--cf-success);
+  color: #fff;
+}
+
+/* ── Legend overlay ── */
+.cf-voicemap__legend {
+  position: absolute;
+  bottom: 1rem;
+  left: 1rem;
+  z-index: 1000;
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(8px);
+  padding: 0.5rem 0.75rem;
+  border-radius: var(--cf-radius);
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--cf-text-secondary);
+  box-shadow: var(--cf-shadow);
+}
+
+.cf-voicemap__legend-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+}
+
+.cf-voicemap__legend-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+/* ── Add button ── */
+.cf-voicemap__add-btn {
+  position: absolute;
+  bottom: 1rem;
+  right: 1rem;
+  z-index: 1000;
+  appearance: none;
+  border: none;
+  background: var(--cf-primary);
+  color: #fff;
+  font-weight: 700;
+  font-size: 0.95rem;
+  padding: 0.75rem 1.5rem;
+  border-radius: var(--cf-radius-full);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  box-shadow: 0 4px 20px rgba(0, 80, 187, 0.4);
+  transition: all var(--cf-transition);
+}
+
+.cf-voicemap__add-btn:hover {
+  background: var(--cf-primary-hover);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 28px rgba(0, 80, 187, 0.5);
+}
+
+.cf-voicemap__add-btn:active {
+  transform: translateY(0);
+}
+
+.cf-voicemap__add-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* ── Side panel (desktop) ── */
+.cf-voicemap__panel {
+  width: 360px;
+  flex-shrink: 0;
+  background: #fff;
+  border-left: 1px solid var(--cf-border-light);
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+}
+
+.cf-voicemap__panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1.25rem 1.5rem;
+  border-bottom: 1px solid var(--cf-border-light);
+  flex-shrink: 0;
+}
+
+.cf-voicemap__panel-title {
+  font-size: 1.15rem;
+  font-weight: 800;
+  margin: 0;
+}
+
+.cf-voicemap__panel-close {
+  appearance: none;
+  border: none;
+  background: none;
+  color: var(--cf-text-muted);
+  cursor: pointer;
+  padding: 0.5rem;
+  border-radius: var(--cf-radius-sm);
+  transition: all var(--cf-transition);
+  /* Bigger touch target on mobile */
+  min-width: 44px;
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.cf-voicemap__panel-close:hover {
+  background: var(--cf-surface);
+  color: var(--cf-text);
+}
+
+/* ── "Click to place" hint ── */
+.cf-voicemap__panel-hint {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem 1.5rem;
+  text-align: center;
+  color: var(--cf-text-secondary);
+}
+
+.cf-voicemap__panel-hint-icon {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: var(--cf-primary-light);
+  color: var(--cf-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 1rem;
+  animation: cf-bounce 2s ease-in-out infinite;
+}
+
+@keyframes cf-bounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-8px); }
+}
+
+.cf-voicemap__panel-hint p {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 600;
+  line-height: 1.5;
+}
+
+/* ── Form ── */
+.cf-voicemap__form {
+  flex: 1;
+  padding: 1.25rem 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.cf-voicemap__form-section {
+  display: grid;
+  gap: 0.5rem;
+}
+
+.cf-voicemap__cat-grid {
+  display: flex;
+  gap: 0.4rem;
+  flex-wrap: wrap;
+}
+
+.cf-voicemap__cat-chip {
+  appearance: none;
+  border: 2px solid var(--chip-color);
+  border-radius: var(--cf-radius-full);
+  padding: 0.35rem 0.85rem;
+  font-size: 0.85rem;
+  font-weight: 650;
+  cursor: pointer;
+  background: transparent;
+  color: var(--chip-color);
+  transition: all 150ms;
+  /* Good touch target */
+  min-height: 36px;
+}
+
+.cf-voicemap__cat-chip:hover {
+  opacity: 0.8;
+}
+
+.cf-voicemap__cat-chip--active {
+  background: var(--chip-color);
+  color: #fff;
+}
+
+.cf-voicemap__cat-chip--active[style*="--chip-color: #FFDC47"] {
+  color: #333;
+}
+
+.cf-voicemap__charcount {
+  text-align: right;
+  font-size: 0.8rem;
+  color: var(--cf-text-muted);
+}
+
+.cf-voicemap__panel-info {
+  padding: 1rem 1.5rem;
+  margin: 0;
+  font-size: 0.8rem;
+  color: var(--cf-text-muted);
+  text-align: center;
+  border-top: 1px solid var(--cf-border-light);
+  flex-shrink: 0;
+}
+
+/* ── Pin icon reset ── */
+.cf-map-pin {
+  background: none !important;
+  border: none !important;
+}
+
+/* ── Cluster styling ── */
+.cf-cluster-icon {
+  background: none !important;
+  border: none !important;
+}
+
+.cf-cluster {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: var(--espoo-blue);
+  color: #fff;
+  font-weight: 800;
+  font-size: 0.85rem;
+  box-shadow: 0 2px 12px rgba(0, 80, 187, 0.4), 0 0 0 4px rgba(0, 80, 187, 0.2);
+  transition: transform 200ms;
+}
+
+.cf-cluster:hover {
+  transform: scale(1.1);
+}
+
+/* ── Popup styling ── */
+.cf-map-popup {
+  min-width: 180px;
+  max-width: 260px;
+}
+
+.cf-map-popup__category {
+  display: inline-block;
+  padding: 0.15rem 0.55rem;
+  border-radius: var(--cf-radius-full);
+  font-weight: 650;
+  font-size: 0.75rem;
+  text-transform: capitalize;
+  margin-bottom: 0.25rem;
+}
+
+.cf-map-popup__message {
+  font-size: 0.9rem;
+  line-height: 1.5;
+  margin: 0.25rem 0;
+  color: #222;
+  word-break: break-word;
+}
+
+.cf-map-popup__date {
+  font-size: 0.8rem;
+  color: #888;
+}
+
+/* ── Override leaflet popup ── */
+.leaflet-popup-content-wrapper {
+  border-radius: 12px !important;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15) !important;
+}
+
+.leaflet-popup-content {
+  margin: 12px 14px !important;
+}
+
+.leaflet-popup-tip {
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15) !important;
+}
+
+/* ============================================================
+   Mobile — Bottom sheet overlay instead of side panel
+   ============================================================ */
+@media (max-width: 768px) {
+  .cf-voicemap-page__hero {
+    padding: 0.75rem 1rem;
+  }
+
+  .cf-voicemap-page__title {
+    font-size: 1.1rem;
+  }
+
+  .cf-voicemap-page__subtitle {
+    font-size: 0.8rem;
+  }
+
+  /* Map always fills the screen */
+  .cf-voicemap {
+    flex-direction: column;
+  }
+
+  .cf-voicemap__map {
+    /* Map takes full height always */
+    position: absolute;
+    inset: 0;
+  }
+
+  /* Panel becomes a bottom sheet overlay */
+  .cf-voicemap__panel {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 1001;
+    width: 100%;
+    max-height: 55vh;
+    border-left: none;
+    border-top: none;
+    border-radius: 20px 20px 0 0;
+    box-shadow: 0 -4px 30px rgba(0, 0, 0, 0.15);
+    animation: cf-slide-up 250ms ease-out;
+  }
+
+  @keyframes cf-slide-up {
+    from { transform: translateY(100%); }
+    to { transform: translateY(0); }
+  }
+
+  /* Drag handle indicator */
+  .cf-voicemap__panel-header::before {
+    content: "";
+    position: absolute;
+    top: 8px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 36px;
+    height: 4px;
+    border-radius: 2px;
+    background: var(--cf-border);
+  }
+
+  .cf-voicemap__panel-header {
+    position: relative;
+    padding: 1.25rem 1rem 0.75rem;
+  }
+
+  .cf-voicemap__panel-hint {
+    padding: 1.5rem 1rem;
+  }
+
+  .cf-voicemap__panel-hint-icon {
+    width: 48px;
+    height: 48px;
+    margin-bottom: 0.75rem;
+  }
+
+  .cf-voicemap__panel-hint-icon svg {
+    width: 24px;
+    height: 24px;
+  }
+
+  .cf-voicemap__form {
+    padding: 0.75rem 1rem 1rem;
+    gap: 1rem;
+  }
+
+  /* Smaller textarea on mobile */
+  .cf-voicemap__form .cf-textarea {
+    min-height: 80px;
+  }
+
+  .cf-voicemap__panel-info {
+    padding: 0.75rem 1rem;
+  }
+
+  /* Legend: smaller, above the add button */
+  .cf-voicemap__legend {
+    font-size: 0.7rem;
+    padding: 0.35rem 0.6rem;
+    gap: 0.4rem;
+    bottom: 4rem;
+    left: 0.5rem;
+    max-width: calc(100vw - 7rem);
+  }
+
+  .cf-voicemap__legend-dot {
+    width: 8px;
+    height: 8px;
+  }
+
+  /* Add button: bigger touch target on mobile */
+  .cf-voicemap__add-btn {
+    bottom: 1rem;
+    right: 0.75rem;
+    padding: 0.85rem 1.25rem;
+    font-size: 0.9rem;
+  }
+
+  /* Success toast above the bottom sheet or add button */
+  .cf-voicemap__toast--success {
+    bottom: 5.5rem;
+    font-size: 0.8rem;
+    padding: 0.4rem 1rem;
+  }
+}
+
+/* Small phones */
+@media (max-width: 380px) {
+  .cf-voicemap__panel {
+    max-height: 65vh;
+  }
+
+  .cf-voicemap__cat-chip {
+    padding: 0.25rem 0.65rem;
+    font-size: 0.8rem;
+  }
+
+  .cf-voicemap__add-btn {
+    padding: 0.75rem 1rem;
+    font-size: 0.85rem;
+  }
+
+  .cf-voicemap__legend {
+    display: none;
+  }
+}

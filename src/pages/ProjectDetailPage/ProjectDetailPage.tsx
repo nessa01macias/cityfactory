@@ -1,8 +1,9 @@
+import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { Card } from "../../components/ui/Card";
 import { Badge } from "../../components/ui/Badge";
 import { ButtonLink } from "../../components/ui/Button";
-import { getProjectBySlug } from "../../data/projects";
+import { fetchProjectBySlug, type Project } from "../../api/projects";
 import { formatDate } from "../../utils/format";
 import { statusToTone } from "../../utils/projectStatus";
 import "../page.css";
@@ -28,15 +29,50 @@ function statusMeaning(status: string) {
 
 export function ProjectDetailPage() {
   const { slug } = useParams();
-  const project = slug ? getProjectBySlug(slug) : undefined;
+  const [project, setProject] = useState<Project | null | undefined>(undefined);
+  const [error, setError] = useState<string | null>(null);
 
-  if (!project) {
+  useEffect(() => {
+    if (!slug) return;
+    const ac = new AbortController();
+    fetchProjectBySlug(slug, { signal: ac.signal })
+      .then((p) => setProject(p))
+      .catch((e: unknown) => {
+        if ((e as { name?: string })?.name === "AbortError") return;
+        setError("We couldn't load this project right now.");
+      });
+    return () => ac.abort();
+  }, [slug]);
+
+  if (error) {
+    return (
+      <section className="cf-section">
+        <div className="cf-container">
+          <div className="cf-alert cf-alert--error">
+            {error} <Link to="/projects">Back to projects</Link>
+          </div>
+        </div>
+      </section>
+    );
+  }
+
+  if (project === null) {
     return (
       <section className="cf-section">
         <div className="cf-container">
           <div className="cf-alert cf-alert--error">
             Project not found. <Link to="/projects">Back to projects</Link>
           </div>
+        </div>
+      </section>
+    );
+  }
+
+  if (project === undefined) {
+    return (
+      <section className="cf-hero">
+        <div className="cf-container cf-hero__inner">
+          <h1 className="cf-h1">Loading…</h1>
         </div>
       </section>
     );
@@ -54,6 +90,9 @@ export function ProjectDetailPage() {
           <h1 className="cf-h1">{project.title}</h1>
           <div style={{ display: "flex", gap: "0.5rem", flexWrap: "wrap", alignItems: "center" }}>
             <Badge tone={statusToTone(project.status)}>{project.status}</Badge>
+            <Badge tone={`source-${project.source}`}>
+              {project.source === "espoo" ? "Espoo" : "Helsinki"}
+            </Badge>
             <span
               style={{
                 display: "inline-flex",
@@ -85,6 +124,18 @@ export function ProjectDetailPage() {
             ))}
           </div>
           <p className="cf-lead">{project.description}</p>
+          {project.externalUrl ? (
+            <div style={{ marginTop: "0.5rem" }}>
+              <a
+                href={project.externalUrl}
+                target="_blank"
+                rel="noreferrer"
+                className="cf-btn cf-btn--white"
+              >
+                View on {project.source === "helsinki" ? "Kerrokantasi" : "original site"} &rarr;
+              </a>
+            </div>
+          ) : null}
         </div>
       </section>
 
@@ -116,6 +167,15 @@ export function ProjectDetailPage() {
 
           <Card>
             <div className="cf-card__title">About this project</div>
+            {project.imageUrl ? (
+              <img
+                src={project.imageUrl}
+                alt=""
+                className="cf-card__img"
+                style={{ margin: "0.75rem 0" }}
+                loading="lazy"
+              />
+            ) : null}
             <div style={{ height: "0.5rem" }} />
             {project.body.map((p, i) => (
               <p key={i} style={{ margin: i === project.body.length - 1 ? 0 : "0 0 1rem", lineHeight: 1.65 }}>
