@@ -4,6 +4,7 @@ import { Button } from "../../components/ui/Button";
 import { supabase } from "../../supabaseClient";
 import { normalizeReference, type FeedbackSubmission } from "../../storage/feedback";
 import { formatDateTime } from "../../utils/format";
+import { useTranslation } from "../../i18n/useTranslation";
 import "../page.css";
 
 function rowToSubmission(row: Record<string, unknown>): FeedbackSubmission {
@@ -24,6 +25,9 @@ function rowToSubmission(row: Record<string, unknown>): FeedbackSubmission {
 }
 
 export function FeedbackStatusPage() {
+  const t = useTranslation();
+  const ts = t.feedbackStatus;
+
   const initialRef = useMemo(() => {
     const u = new URL(window.location.href);
     return u.searchParams.get("ref") || "";
@@ -37,10 +41,7 @@ export function FeedbackStatusPage() {
   const lookup = async (reference: string) => {
     setError(null);
     const norm = normalizeReference(reference);
-    if (!norm) {
-      setError("Enter a reference number (for example, #CF-20240301-1234).");
-      return;
-    }
+    if (!norm) { setError(ts.errEmpty); return; }
     setLoading(true);
     const { data, error: dbError } = await supabase
       .from("feedback")
@@ -48,14 +49,8 @@ export function FeedbackStatusPage() {
       .eq("reference", norm)
       .maybeSingle();
     setLoading(false);
-    if (dbError) {
-      setError("We couldn't look up that reference right now. Please try again.");
-      return;
-    }
-    if (!data) {
-      setError("We couldn't find that reference number.");
-      return;
-    }
+    if (dbError) { setError(ts.errLookup); return; }
+    if (!data) { setError(ts.errNotFound); return; }
     setResult(rowToSubmission(data));
   };
 
@@ -68,10 +63,8 @@ export function FeedbackStatusPage() {
     <>
       <section className="cf-hero">
         <div className="cf-container cf-hero__inner">
-          <h1 className="cf-h1">Check Submission Status</h1>
-          <p className="cf-lead">
-            Enter your reference number (for example, #CF-20240301-1234) to check the status of your submission.
-          </p>
+          <h1 className="cf-h1">{ts.title}</h1>
+          <p className="cf-lead">{ts.lead}</p>
         </div>
       </section>
 
@@ -79,61 +72,30 @@ export function FeedbackStatusPage() {
         <div className="cf-container">
           <div className="cf-grid cf-grid--2" style={{ alignItems: "start" }}>
             <Card>
-              <div className="cf-card__title">Lookup</div>
-              <form
-                onSubmit={(e) => {
-                  e.preventDefault();
-                  void lookup(ref);
-                }}
-                className="cf-grid"
-                style={{ gap: "0.75rem", marginTop: "0.75rem" }}
-              >
+              <div className="cf-card__title">{ts.lookupTitle}</div>
+              <form onSubmit={(e) => { e.preventDefault(); void lookup(ref); }} className="cf-grid" style={{ gap: "0.75rem", marginTop: "0.75rem" }}>
                 <div className="cf-field">
-                  <label className="cf-label" htmlFor="ref">
-                    Reference number
-                  </label>
-                  <input
-                    id="ref"
-                    className="cf-input"
-                    value={ref}
-                    onChange={(e) => setRef(e.target.value)}
-                    placeholder="#CF-20240301-1234"
-                  />
+                  <label className="cf-label" htmlFor="ref">{ts.refLabel}</label>
+                  <input id="ref" className="cf-input" value={ref} onChange={(e) => setRef(e.target.value)} placeholder={ts.refPlaceholder} />
                 </div>
-                <Button type="submit">Check status</Button>
+                <Button type="submit">{ts.checkButton}</Button>
               </form>
               {error ? <div className="cf-alert cf-alert--error" style={{ marginTop: "0.75rem" }}>{error}</div> : null}
             </Card>
 
             <Card>
-              <div className="cf-card__title">Status</div>
+              <div className="cf-card__title">{ts.statusTitle}</div>
               {result ? (
                 <div className="cf-list" style={{ marginTop: "0.75rem" }}>
-                  <div>
-                    <strong>Reference:</strong> #{normalizeReference(result.reference)}
-                  </div>
-                  <div>
-                    <strong>Date submitted:</strong> {formatDateTime(result.createdAt)}
-                  </div>
-                  <div>
-                    <strong>Type:</strong> {result.type}
-                  </div>
-                  <div>
-                    <strong>Current status:</strong> {result.status}
-                  </div>
-                  <div>
-                    <strong>Last updated:</strong> {formatDateTime(result.lastUpdatedAt)}
-                  </div>
-                  {result.publicNotes ? (
-                    <div>
-                      <strong>Notes:</strong> {result.publicNotes}
-                    </div>
-                  ) : null}
+                  <div><strong>{ts.refDisplay}</strong> #{normalizeReference(result.reference)}</div>
+                  <div><strong>{ts.dateSubmitted}</strong> {formatDateTime(result.createdAt)}</div>
+                  <div><strong>{ts.type}</strong> {result.type}</div>
+                  <div><strong>{ts.currentStatus}</strong> {result.status}</div>
+                  <div><strong>{ts.lastUpdated}</strong> {formatDateTime(result.lastUpdatedAt)}</div>
+                  {result.publicNotes ? <div><strong>{ts.notes}</strong> {result.publicNotes}</div> : null}
                 </div>
               ) : (
-                <p className="cf-card__meta" style={{ marginTop: "0.75rem" }}>
-                  Enter a reference number to see details.
-                </p>
+                <p className="cf-card__meta" style={{ marginTop: "0.75rem" }}>{ts.emptyState}</p>
               )}
             </Card>
           </div>
@@ -142,4 +104,3 @@ export function FeedbackStatusPage() {
     </>
   );
 }
-

@@ -4,11 +4,15 @@ import { Badge } from "../../components/ui/Badge";
 import { ButtonLink } from "../../components/ui/Button";
 import { fetchUpcomingEvents, eventPath, preferredText, eventCity, CITY_LABELS, type LinkedEvent, type CityFilter } from "../../api/linkedEvents";
 import { formatDateTime, truncate } from "../../utils/format";
+import { useTranslation } from "../../i18n/useTranslation";
 import "../page.css";
 
 const CITY_OPTIONS: CityFilter[] = ["all", "espoo", "helsinki", "vantaa"];
 
 export function EventsPage() {
+  const t = useTranslation();
+  const te = t.events;
+
   const [events, setEvents] = useState<LinkedEvent[] | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [query, setQuery] = useState("");
@@ -20,10 +24,10 @@ export function EventsPage() {
       .then((r) => setEvents(r.data))
       .catch((e: unknown) => {
         if ((e as { name?: string })?.name === "AbortError") return;
-        setError("We couldn't load events right now. Please try again soon.");
+        setError(te.error);
       });
     return () => ac.abort();
-  }, []);
+  }, [te.error]);
 
   const filtered = useMemo(() => {
     if (!events) return null;
@@ -42,11 +46,8 @@ export function EventsPage() {
     <>
       <section className="cf-hero">
         <div className="cf-container cf-hero__inner">
-          <h1 className="cf-h1">Events</h1>
-          <p className="cf-lead">
-            Workshops, open sessions, Q&amp;A nights, and community gatherings across the Helsinki metropolitan area
-            — Espoo, Helsinki, and Vantaa.
-          </p>
+          <h1 className="cf-h1">{te.title}</h1>
+          <p className="cf-lead">{te.lead}</p>
 
           <div style={{ marginTop: "1rem", display: "flex", flexWrap: "wrap", gap: "0.5rem", alignItems: "center" }}>
             {CITY_OPTIONS.map((city) => (
@@ -76,14 +77,8 @@ export function EventsPage() {
               id="search"
               value={query}
               onChange={(e) => setQuery(e.target.value)}
-              placeholder="Search events by title..."
-              style={{
-                background: "rgba(255,255,255,0.15)",
-                borderColor: "rgba(255,255,255,0.25)",
-                color: "#fff",
-                padding: "0.8rem 1rem",
-                fontSize: "1rem"
-              }}
+              placeholder={te.searchPlaceholder}
+              style={{ background: "rgba(255,255,255,0.15)", borderColor: "rgba(255,255,255,0.25)", color: "#fff", padding: "0.8rem 1rem", fontSize: "1rem" }}
             />
           </div>
         </div>
@@ -105,37 +100,26 @@ export function EventsPage() {
                 );
               }
 
-              const title = preferredText(ev.name) || "Untitled event";
+              const title = preferredText(ev.name) || te.untitled;
               const city = eventCity(ev);
-              const when = ev.start_time ? formatDateTime(ev.start_time) : "Time to be confirmed";
-              const where =
-                preferredText(ev.location?.name) ||
-                preferredText(ev.location?.street_address) ||
-                "Location to be confirmed";
+              const when = ev.start_time ? formatDateTime(ev.start_time) : te.timeTbc;
+              const where = preferredText(ev.location?.name) || preferredText(ev.location?.street_address) || te.locationTbc;
               const desc = truncate(preferredText(ev.short_description) || "", 120);
               const imageUrl = ev.images?.[0]?.url || null;
 
               return (
                 <Card key={ev.id}>
-                  {imageUrl ? (
-                    <img src={imageUrl} alt="" className="cf-card__img" loading="lazy" />
-                  ) : null}
+                  {imageUrl ? <img src={imageUrl} alt="" className="cf-card__img" loading="lazy" /> : null}
                   <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: "0.5rem" }}>
                     <div className="cf-card__title" style={{ margin: 0 }}>{title}</div>
                     <Badge tone={city}>{CITY_LABELS[city]}</Badge>
                   </div>
-                  <div className="cf-card__meta">
-                    {when} &middot; {where}
-                  </div>
+                  <div className="cf-card__meta">{when} &middot; {where}</div>
                   {desc ? <p style={{ margin: "0.25rem 0 0.75rem", color: "var(--cf-text-secondary)", fontSize: "0.925rem" }}>{desc}</p> : null}
                   <div className="cf-actions" style={{ marginTop: 0 }}>
-                    <ButtonLink to={eventPath(ev.id)} variant="secondary">
-                      View details
-                    </ButtonLink>
+                    <ButtonLink to={eventPath(ev.id)} variant="secondary">{te.viewDetails}</ButtonLink>
                     {preferredText(ev.info_url) ? (
-                      <a className="cf-btn cf-btn--ghost" href={preferredText(ev.info_url)} target="_blank" rel="noreferrer">
-                        External link &rarr;
-                      </a>
+                      <a className="cf-btn cf-btn--ghost" href={preferredText(ev.info_url)} target="_blank" rel="noreferrer">{te.externalLink}</a>
                     ) : null}
                   </div>
                 </Card>
@@ -144,22 +128,15 @@ export function EventsPage() {
           </div>
 
           {filtered && filtered.length === 0 ? (
-            <div className="cf-alert cf-alert--info" style={{ marginTop: "1.5rem" }}>
-              No events matched your search. Try a different keyword.
-            </div>
+            <div className="cf-alert cf-alert--info" style={{ marginTop: "1.5rem" }}>{te.noResults}</div>
           ) : null}
 
           <div style={{ height: "2.5rem" }} />
 
           <Card className="cf-card--blue">
-            <div className="cf-card__title">Want to host an event at City Factory?</div>
-            <p className="cf-card__meta">
-              If you're a community group, organization, or city team and want to host a workshop or event, get in
-              touch.
-            </p>
-            <ButtonLink to="/contact">
-              Contact us
-            </ButtonLink>
+            <div className="cf-card__title">{te.hostTitle}</div>
+            <p className="cf-card__meta">{te.hostDesc}</p>
+            <ButtonLink to="/contact">{te.contactUs}</ButtonLink>
           </Card>
         </div>
       </section>
