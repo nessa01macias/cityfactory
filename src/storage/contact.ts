@@ -1,3 +1,5 @@
+import { supabase } from "../supabaseClient";
+
 export type ContactTopic =
   | "General inquiry"
   | "Partnership / collaboration"
@@ -16,15 +18,6 @@ export type ContactMessage = {
   message: string;
 };
 
-const STORAGE_KEY = "cf.contact.messages";
-
-export function saveContactMessage(msg: ContactMessage) {
-  const raw = localStorage.getItem(STORAGE_KEY);
-  const arr = raw ? (JSON.parse(raw) as ContactMessage[]) : [];
-  arr.unshift(msg);
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(arr));
-}
-
 export function newContactId(now = new Date()) {
   const rand = Math.floor(100000 + Math.random() * 900000);
   return `MSG-${now.getFullYear()}${String(now.getMonth() + 1).padStart(2, "0")}${String(now.getDate()).padStart(
@@ -33,3 +26,14 @@ export function newContactId(now = new Date()) {
   )}-${rand}`;
 }
 
+export async function saveContactMessage(msg: ContactMessage) {
+  const { error } = await supabase.from("contact_messages").insert({
+    reference: msg.id,
+    created_at: msg.createdAt,
+    name: msg.name,
+    email: msg.email,
+    topic: msg.topic,
+    message: msg.message,
+  });
+  if (error) throw error;
+}

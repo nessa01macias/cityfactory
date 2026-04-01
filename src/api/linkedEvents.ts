@@ -23,6 +23,7 @@ export type LinkedEvent = {
   location?: LinkedEventLocation | null;
   images?: LinkedEventImage[] | null;
   info_url?: LocalizedString | null;
+  data_source?: string | null;
 };
 
 type LinkedEventsResponse = {
@@ -39,13 +40,48 @@ export function eventPath(id: string) {
   return `/events/${encodeURIComponent(id)}`;
 }
 
-export async function fetchUpcomingEspooEvents(opts?: { pageSize?: number; signal?: AbortSignal }) {
+export type City = "espoo" | "helsinki" | "vantaa";
+export type CityFilter = "all" | City;
+
+/** Derive a city label from the event's data_source or location text. */
+export function eventCity(ev: LinkedEvent): City {
+  const src = ev.data_source?.toLowerCase() ?? "";
+  if (src === "espoo") return "espoo";
+  if (src === "helsinki") return "helsinki";
+
+  // Helmet (library) events span the metro area — try the location text
+  const loc = (
+    preferredText(ev.location?.name) +
+    " " +
+    preferredText(ev.location?.street_address)
+  ).toLowerCase();
+
+  if (loc.includes("espoo") || loc.includes("esbo")) return "espoo";
+  if (loc.includes("vantaa") || loc.includes("vanda")) return "vantaa";
+  if (loc.includes("helsinki") || loc.includes("helsingfors")) return "helsinki";
+
+  // Fallback based on data source
+  if (src === "helmet") return "helsinki"; // most helmet events are in Helsinki
+  return "helsinki"; // default for unknown sources
+}
+
+export const CITY_LABELS: Record<CityFilter, string> = {
+  all: "All cities",
+  espoo: "Espoo",
+  helsinki: "Helsinki",
+  vantaa: "Vantaa",
+};
+
+export async function fetchUpcomingEvents(opts?: { pageSize?: number; signal?: AbortSignal }) {
   const pageSize = opts?.pageSize ?? 20;
-  const url = `${BASE}/event/?data_source=espoo&start=now&sort=start_time&page_size=${pageSize}`;
+  const url = `${BASE}/event/?start=now&sort=start_time&page_size=${pageSize}`;
   const res = await fetch(url, { signal: opts?.signal });
   if (!res.ok) throw new Error(`Events API error (${res.status})`);
   return (await res.json()) as LinkedEventsResponse;
 }
+
+/** @deprecated Use fetchUpcomingEvents instead */
+export const fetchUpcomingEspooEvents = fetchUpcomingEvents;
 
 export async function fetchEventById(id: string, opts?: { signal?: AbortSignal }) {
   const url = `${BASE}/event/${encodeURIComponent(id)}/`;

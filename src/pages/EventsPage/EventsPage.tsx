@@ -1,18 +1,22 @@
 import { useEffect, useMemo, useState } from "react";
 import { Card } from "../../components/ui/Card";
+import { Badge } from "../../components/ui/Badge";
 import { ButtonLink } from "../../components/ui/Button";
-import { fetchUpcomingEspooEvents, eventPath, preferredText, type LinkedEvent } from "../../api/linkedEvents";
+import { fetchUpcomingEvents, eventPath, preferredText, eventCity, CITY_LABELS, type LinkedEvent, type CityFilter } from "../../api/linkedEvents";
 import { formatDateTime, truncate } from "../../utils/format";
 import "../page.css";
+
+const CITY_OPTIONS: CityFilter[] = ["all", "espoo", "helsinki", "vantaa"];
 
 export function EventsPage() {
   const [events, setEvents] = useState<LinkedEvent[] | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [query, setQuery] = useState("");
+  const [cityFilter, setCityFilter] = useState<CityFilter>("all");
 
   useEffect(() => {
     const ac = new AbortController();
-    fetchUpcomingEspooEvents({ pageSize: 20, signal: ac.signal })
+    fetchUpcomingEvents({ pageSize: 40, signal: ac.signal })
       .then((r) => setEvents(r.data))
       .catch((e: unknown) => {
         if ((e as { name?: string })?.name === "AbortError") return;
@@ -23,10 +27,16 @@ export function EventsPage() {
 
   const filtered = useMemo(() => {
     if (!events) return null;
+    let list = events;
+    if (cityFilter !== "all") {
+      list = list.filter((ev) => eventCity(ev) === cityFilter);
+    }
     const q = query.trim().toLowerCase();
-    if (!q) return events;
-    return events.filter((ev) => preferredText(ev.name).toLowerCase().includes(q));
-  }, [events, query]);
+    if (q) {
+      list = list.filter((ev) => preferredText(ev.name).toLowerCase().includes(q));
+    }
+    return list;
+  }, [events, query, cityFilter]);
 
   return (
     <>
@@ -34,11 +44,33 @@ export function EventsPage() {
         <div className="cf-container cf-hero__inner">
           <h1 className="cf-h1">Events</h1>
           <p className="cf-lead">
-            Workshops, open sessions, Q&amp;A nights, and community gatherings. All events are free and open to everyone
-            — whether you've lived in Espoo for decades or just moved here.
+            Workshops, open sessions, Q&amp;A nights, and community gatherings across the Helsinki metropolitan area
+            — Espoo, Helsinki, and Vantaa.
           </p>
 
-          <div style={{ marginTop: "1rem", maxWidth: "480px" }}>
+          <div style={{ marginTop: "1rem", display: "flex", flexWrap: "wrap", gap: "0.5rem", alignItems: "center" }}>
+            {CITY_OPTIONS.map((city) => (
+              <button
+                key={city}
+                onClick={() => setCityFilter(city)}
+                style={{
+                  padding: "0.5rem 1.1rem",
+                  borderRadius: "var(--cf-radius-full)",
+                  border: "1px solid rgba(255,255,255,0.25)",
+                  background: cityFilter === city ? "#fff" : "rgba(255,255,255,0.1)",
+                  color: cityFilter === city ? "var(--espoo-night)" : "#fff",
+                  fontWeight: 600,
+                  fontSize: "0.9rem",
+                  cursor: "pointer",
+                  transition: "all 0.15s ease",
+                }}
+              >
+                {CITY_LABELS[city]}
+              </button>
+            ))}
+          </div>
+
+          <div style={{ marginTop: "0.75rem", maxWidth: "480px" }}>
             <input
               className="cf-input"
               id="search"
@@ -74,6 +106,7 @@ export function EventsPage() {
               }
 
               const title = preferredText(ev.name) || "Untitled event";
+              const city = eventCity(ev);
               const when = ev.start_time ? formatDateTime(ev.start_time) : "Time to be confirmed";
               const where =
                 preferredText(ev.location?.name) ||
@@ -87,7 +120,10 @@ export function EventsPage() {
                   {imageUrl ? (
                     <img src={imageUrl} alt="" className="cf-card__img" loading="lazy" />
                   ) : null}
-                  <div className="cf-card__title">{title}</div>
+                  <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: "0.5rem" }}>
+                    <div className="cf-card__title" style={{ margin: 0 }}>{title}</div>
+                    <Badge tone={city}>{CITY_LABELS[city]}</Badge>
+                  </div>
                   <div className="cf-card__meta">
                     {when} &middot; {where}
                   </div>

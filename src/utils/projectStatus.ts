@@ -1,4 +1,4 @@
-import type { ProjectStatus } from "../data/projects";
+import type { ProjectStatus } from "../api/projects";
 import type { BadgeTone } from "../components/ui/Badge";
 
 export function statusToTone(status: ProjectStatus): BadgeTone {
@@ -17,4 +17,3 @@ export function statusToTone(status: ProjectStatus): BadgeTone {
       return "completed";
   }
 }
-

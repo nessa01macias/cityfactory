@@ -2,47 +2,8 @@ import { NavLink, Outlet } from "react-router-dom";
 import { useMemo, useState } from "react";
 import "./layout.css";
 import { useLanguage } from "../../state/language";
-
-type NavItem = { to: string; label: string };
-
-const NAV_ITEMS: NavItem[] = [
-  { to: "/", label: "Home" },
-  { to: "/events", label: "Events" },
-  { to: "/projects", label: "Projects" },
-  { to: "/get-involved", label: "Get Involved" },
-  { to: "/feedback", label: "Feedback" },
-  { to: "/contact", label: "Contact" }
-];
-
-/* Clean SVG recreation of the official Espoo swirl mark */
-function EspooSwirl({ className }: { className?: string }) {
-  return (
-    <svg
-      viewBox="0 0 48 48"
-      fill="none"
-      xmlns="http://www.w3.org/2000/svg"
-      aria-hidden="true"
-      className={className}
-    >
-      {/* Outer swirl arc — large open ellipse going counterclockwise */}
-      <path
-        d="M33 35C26 42 8 38 5 24 2 10 13 1 27 4c10 2 15 10 14 18"
-        stroke="currentColor"
-        strokeWidth="3.2"
-        strokeLinecap="round"
-        fill="none"
-      />
-      {/* Inner swirl arc — smaller offset ellipse creating the overlap */}
-      <path
-        d="M35 18c1 10-6 20-17 18S3 22 9 13c4-6 11-8 18-5"
-        stroke="currentColor"
-        strokeWidth="3.2"
-        strokeLinecap="round"
-        fill="none"
-      />
-    </svg>
-  );
-}
+import { useTranslation } from "../../i18n/useTranslation";
+import espooLogo from "../../utils/espoo logo.png";
 
 function GlobeIcon() {
   return (
@@ -73,10 +34,24 @@ function MenuIcon({ open }: { open: boolean }) {
 export function Layout() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const { language, toggleLanguage } = useLanguage();
+  const t = useTranslation();
+
+  const navItems = useMemo(
+    () => [
+      { to: "/", label: t.nav.home },
+      { to: "/events", label: t.nav.events },
+      { to: "/projects", label: t.nav.projects },
+      { to: "/get-involved", label: t.nav.getInvolved },
+      { to: "/facilities", label: t.nav.facilities },
+      { to: "/feedback", label: t.nav.feedback },
+      { to: "/contact", label: t.nav.contact },
+    ],
+    [t]
+  );
 
   const navLinks = useMemo(
     () =>
-      NAV_ITEMS.map((item) => (
+      navItems.map((item) => (
         <NavLink
           key={item.to}
           to={item.to}
@@ -86,7 +61,7 @@ export function Layout() {
           {item.label}
         </NavLink>
       )),
-    []
+    [navItems]
   );
 
   return (
@@ -112,15 +87,13 @@ export function Layout() {
           e.currentTarget.style.left = "-9999px";
         }}
       >
-        Skip to content
+        {t.header.skipToContent}
       </a>
 
       <header className="cf-header">
         <div className="cf-container cf-header__inner">
-          <NavLink to="/" className="cf-brand" aria-label="City Factory home" end>
-            <span className="cf-brand__mark">
-              <EspooSwirl />
-            </span>
+          <NavLink to="/" className="cf-brand" aria-label={t.header.homeAriaLabel} end>
+            <img src={espooLogo} alt="" className="cf-brand__logo" />
             <span className="cf-brand__text">
               <span className="cf-brand__name">City Factory</span>
               <span className="cf-brand__sub">ESPOO</span>
@@ -136,8 +109,8 @@ export function Layout() {
               type="button"
               className="cf-iconbtn"
               onClick={toggleLanguage}
-              aria-label={`Switch to ${language === "EN" ? "Finnish" : "English"}`}
-              title="Language"
+              aria-label={t.header.switchLang}
+              title={t.header.language}
             >
               <GlobeIcon />
               {language}
@@ -150,7 +123,7 @@ export function Layout() {
               onClick={() => setMobileOpen((v) => !v)}
             >
               <MenuIcon open={mobileOpen} />
-              <span>Menu</span>
+              <span>{t.header.menu}</span>
             </button>
           </div>
         </div>
@@ -173,42 +146,41 @@ export function Layout() {
           <div className="cf-footer__top">
             <div>
               <div className="cf-brand" aria-label="City Factory">
-                <span className="cf-brand__mark">
-                  <EspooSwirl />
-                </span>
+                <img src={espooLogo} alt="" className="cf-brand__logo" />
                 <span className="cf-brand__text">
                   <span className="cf-brand__name">City Factory</span>
                   <span className="cf-brand__sub">ESPOO</span>
                 </span>
               </div>
               <p className="cf-footer__desc">
-                An urban innovation platform by the City of Espoo. Building the future of our city — together.
+                {t.footer.tagline}
               </p>
             </div>
 
             <div className="cf-footer__links-grid">
               <div>
-                <div className="cf-footer__links-heading">Platform</div>
+                <div className="cf-footer__links-heading">{t.footer.platform}</div>
                 <div className="cf-footer__links">
-                  <NavLink to="/" end>Home</NavLink>
-                  <NavLink to="/events">Events</NavLink>
-                  <NavLink to="/projects">Projects</NavLink>
+                  <NavLink to="/" end>{t.nav.home}</NavLink>
+                  <NavLink to="/events">{t.nav.events}</NavLink>
+                  <NavLink to="/projects">{t.nav.projects}</NavLink>
                 </div>
               </div>
               <div>
-                <div className="cf-footer__links-heading">Participate</div>
+                <div className="cf-footer__links-heading">{t.footer.participate}</div>
                 <div className="cf-footer__links">
-                  <NavLink to="/get-involved">Get Involved</NavLink>
-                  <NavLink to="/feedback">Feedback</NavLink>
-                  <NavLink to="/contact">Contact</NavLink>
+                  <NavLink to="/get-involved">{t.nav.getInvolved}</NavLink>
+                  <NavLink to="/feedback">{t.nav.feedback}</NavLink>
+                  <NavLink to="/contact">{t.nav.contact}</NavLink>
                 </div>
               </div>
               <div>
-                <div className="cf-footer__links-heading">Contact</div>
+                <div className="cf-footer__links-heading">{t.footer.contact}</div>
                 <div className="cf-footer__links">
-                  <a href="mailto:cityfactory@espoo.fi">cityfactory@espoo.fi</a>
+                  <a href="mailto:cityfactoryespoo@gmail.com">cityfactoryespoo@gmail.com</a>
+                  <a href="https://instagram.com/cityfactoryespoo" target="_blank" rel="noopener noreferrer">@cityfactoryespoo</a>
                   <span style={{ color: "rgba(255,255,255,0.5)", fontSize: "0.875rem" }}>
-                    Physical location coming soon
+                    {t.footer.locationSoon}
                   </span>
                 </div>
               </div>
@@ -219,13 +191,13 @@ export function Layout() {
 
           <div className="cf-footer__bottom">
             <div className="cf-footer__meta">
-              City Factory is a project of the City of Espoo.
+              {t.footer.meta}
             </div>
             <button
               type="button"
               className="cf-iconbtn"
               onClick={toggleLanguage}
-              aria-label="Toggle language"
+              aria-label={t.header.switchLang}
               style={{
                 background: "rgba(255,255,255,0.1)",
                 borderColor: "rgba(255,255,255,0.15)",
@@ -233,7 +205,7 @@ export function Layout() {
               }}
             >
               <GlobeIcon />
-              {language === "EN" ? "In English" : "Suomeksi"}
+              {t.footer.langLabel}
             </button>
           </div>
         </div>

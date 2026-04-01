@@ -2,7 +2,8 @@ import { useEffect, useMemo, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { ButtonLink } from "../../components/ui/Button";
 import { Card } from "../../components/ui/Card";
-import { fetchEventById, preferredText, type LinkedEvent } from "../../api/linkedEvents";
+import { Badge } from "../../components/ui/Badge";
+import { fetchEventById, preferredText, eventCity, CITY_LABELS, type LinkedEvent } from "../../api/linkedEvents";
 import { formatDateTime } from "../../utils/format";
 import "../page.css";
 
@@ -73,7 +74,10 @@ export function EventDetailPage() {
               &larr; Back to events
             </Link>
           </div>
-          <h1 className="cf-h1">{title}</h1>
+          <div style={{ display: "flex", alignItems: "center", gap: "0.75rem", flexWrap: "wrap" }}>
+            <h1 className="cf-h1" style={{ margin: 0 }}>{title}</h1>
+            {event ? <Badge tone={eventCity(event)}>{CITY_LABELS[eventCity(event)]}</Badge> : null}
+          </div>
           <p className="cf-lead">{when ? `${when}${end ? ` — ${end}` : ""}` : "Time to be confirmed"}</p>
           <p className="cf-lead">{where}</p>
           <div className="cf-actions">
@@ -143,7 +147,7 @@ export function EventDetailPage() {
           <div style={{ height: "1.5rem" }} />
 
           <Card className="cf-card--blue">
-            <div className="cf-card__title">Want City Factory events near you?</div>
+            <div className="cf-card__title">Want more events near you?</div>
             <p className="cf-card__meta" style={{ marginBottom: "0.75rem" }}>
               Share what topics and neighborhoods matter to you — it helps us plan future sessions.
             </p>
