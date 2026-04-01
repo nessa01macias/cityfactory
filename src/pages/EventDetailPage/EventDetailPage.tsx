@@ -5,6 +5,7 @@ import { Card } from "../../components/ui/Card";
 import { Badge } from "../../components/ui/Badge";
 import { fetchEventById, preferredText, eventCity, CITY_LABELS, type LinkedEvent } from "../../api/linkedEvents";
 import { formatDateTime } from "../../utils/format";
+import { useTranslation } from "../../i18n/useTranslation";
 import "../page.css";
 
 function addToCalendarUrl(ev: LinkedEvent) {
@@ -26,6 +27,9 @@ function addToCalendarUrl(ev: LinkedEvent) {
 }
 
 export function EventDetailPage() {
+  const t = useTranslation();
+  const td = t.eventDetail;
+
   const params = useParams();
   const id = useMemo(() => decodeURIComponent(params.id || ""), [params.id]);
 
@@ -39,28 +43,25 @@ export function EventDetailPage() {
       .then((r) => setEvent(r))
       .catch((e: unknown) => {
         if ((e as { name?: string })?.name === "AbortError") return;
-        setError("We couldn't load this event right now.");
+        setError(td.error);
       });
     return () => ac.abort();
-  }, [id]);
+  }, [id, td.error]);
 
   if (!id) {
     return (
       <section className="cf-section">
         <div className="cf-container">
-          <div className="cf-alert cf-alert--error">Missing event id.</div>
+          <div className="cf-alert cf-alert--error">{td.missingId}</div>
         </div>
       </section>
     );
   }
 
-  const title = preferredText(event?.name) || (event ? "Untitled event" : "Loading…");
+  const title = preferredText(event?.name) || (event ? td.untitled : td.loading);
   const when = event?.start_time ? formatDateTime(event.start_time) : null;
   const end = event?.end_time ? formatDateTime(event.end_time) : null;
-  const where =
-    preferredText(event?.location?.name) ||
-    preferredText(event?.location?.street_address) ||
-    (event ? "Location to be confirmed" : null);
+  const where = preferredText(event?.location?.name) || preferredText(event?.location?.street_address) || (event ? td.locationTbc : null);
   const imageUrl = event?.images?.[0]?.url || null;
   const infoUrl = preferredText(event?.info_url) || null;
   const desc = preferredText(event?.description) || preferredText(event?.short_description) || "";
@@ -70,31 +71,21 @@ export function EventDetailPage() {
       <section className="cf-hero">
         <div className="cf-container cf-hero__inner">
           <div>
-            <Link to="/events" style={{ color: "rgba(255,255,255,0.7)", fontSize: "0.925rem" }}>
-              &larr; Back to events
-            </Link>
+            <Link to="/events" style={{ color: "rgba(255,255,255,0.7)", fontSize: "0.925rem" }}>{td.backToEvents}</Link>
           </div>
           <div style={{ display: "flex", alignItems: "center", gap: "0.75rem", flexWrap: "wrap" }}>
             <h1 className="cf-h1" style={{ margin: 0 }}>{title}</h1>
             {event ? <Badge tone={eventCity(event)}>{CITY_LABELS[eventCity(event)]}</Badge> : null}
           </div>
-          <p className="cf-lead">{when ? `${when}${end ? ` — ${end}` : ""}` : "Time to be confirmed"}</p>
+          <p className="cf-lead">{when ? `${when}${end ? ` — ${end}` : ""}` : td.timeTbc}</p>
           <p className="cf-lead">{where}</p>
           <div className="cf-actions">
             {infoUrl ? (
-              <a className="cf-btn cf-btn--white" href={infoUrl} target="_blank" rel="noreferrer">
-                Registration / info &rarr;
-              </a>
+              <a className="cf-btn cf-btn--white" href={infoUrl} target="_blank" rel="noreferrer">{td.registration}</a>
             ) : null}
             {event?.start_time ? (
-              <a
-                className="cf-btn"
-                href={addToCalendarUrl(event)}
-                target="_blank"
-                rel="noreferrer"
-                style={{ borderColor: "rgba(255,255,255,0.3)", color: "#fff", background: "rgba(255,255,255,0.12)" }}
-              >
-                Add to calendar
+              <a className="cf-btn" href={addToCalendarUrl(event)} target="_blank" rel="noreferrer" style={{ borderColor: "rgba(255,255,255,0.3)", color: "#fff", background: "rgba(255,255,255,0.12)" }}>
+                {td.addToCalendar}
               </a>
             ) : null}
           </div>
@@ -107,39 +98,20 @@ export function EventDetailPage() {
 
           <div className="cf-grid cf-grid--2">
             <Card>
-              <div className="cf-card__title">Details</div>
+              <div className="cf-card__title">{td.details}</div>
               <div className="cf-list" style={{ marginTop: "0.75rem" }}>
-                <div>
-                  <strong>Start:</strong> {event?.start_time ? formatDateTime(event.start_time) : "TBC"}
-                </div>
-                <div>
-                  <strong>End:</strong> {event?.end_time ? formatDateTime(event.end_time) : "TBC"}
-                </div>
-                <div>
-                  <strong>Location:</strong> {where || "TBC"}
-                </div>
+                <div><strong>{td.start}</strong> {event?.start_time ? formatDateTime(event.start_time) : "TBC"}</div>
+                <div><strong>{td.end}</strong> {event?.end_time ? formatDateTime(event.end_time) : "TBC"}</div>
+                <div><strong>{td.location}</strong> {where || "TBC"}</div>
                 {infoUrl ? (
-                  <div>
-                    <strong>Link:</strong>{" "}
-                    <a href={infoUrl} target="_blank" rel="noreferrer">
-                      {infoUrl}
-                    </a>
-                  </div>
+                  <div><strong>{td.link}</strong>{" "}<a href={infoUrl} target="_blank" rel="noreferrer">{infoUrl}</a></div>
                 ) : null}
               </div>
             </Card>
 
             <Card>
-              <div className="cf-card__title">About</div>
-              {imageUrl ? (
-                <img
-                  src={imageUrl}
-                  alt=""
-                  className="cf-card__img"
-                  style={{ margin: "0.75rem 0" }}
-                  loading="lazy"
-                />
-              ) : null}
+              <div className="cf-card__title">{td.about}</div>
+              {imageUrl ? <img src={imageUrl} alt="" className="cf-card__img" style={{ margin: "0.75rem 0" }} loading="lazy" /> : null}
               {desc ? <p style={{ margin: 0, whiteSpace: "pre-wrap", lineHeight: 1.65 }}>{desc}</p> : <p style={{ margin: 0 }}>—</p>}
             </Card>
           </div>
@@ -147,13 +119,9 @@ export function EventDetailPage() {
           <div style={{ height: "1.5rem" }} />
 
           <Card className="cf-card--blue">
-            <div className="cf-card__title">Want more events near you?</div>
-            <p className="cf-card__meta" style={{ marginBottom: "0.75rem" }}>
-              Share what topics and neighborhoods matter to you — it helps us plan future sessions.
-            </p>
-            <ButtonLink to="/feedback">
-              Share feedback
-            </ButtonLink>
+            <div className="cf-card__title">{td.moreEvents}</div>
+            <p className="cf-card__meta" style={{ marginBottom: "0.75rem" }}>{td.moreEventsDesc}</p>
+            <ButtonLink to="/feedback">{td.shareFeedback}</ButtonLink>
           </Card>
         </div>
       </section>

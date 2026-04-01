@@ -6,28 +6,13 @@ import { ButtonLink } from "../../components/ui/Button";
 import { fetchProjectBySlug, type Project } from "../../api/projects";
 import { formatDate } from "../../utils/format";
 import { statusToTone } from "../../utils/projectStatus";
+import { useTranslation } from "../../i18n/useTranslation";
 import "../page.css";
 
-function statusMeaning(status: string) {
-  switch (status) {
-    case "Idea":
-      return "A challenge or opportunity is identified.";
-    case "Research":
-      return "We gather data, talk to residents, and study options.";
-    case "Planning":
-      return "A proposal is developed and refined.";
-    case "Testing":
-      return "We pilot solutions in real neighborhoods.";
-    case "Implementation":
-      return "The solution is rolled out.";
-    case "Completed":
-      return "Work is completed and outcomes are shared.";
-    default:
-      return "";
-  }
-}
-
 export function ProjectDetailPage() {
+  const t = useTranslation();
+  const td = t.projectDetail;
+
   const { slug } = useParams();
   const [project, setProject] = useState<Project | null | undefined>(undefined);
   const [error, setError] = useState<string | null>(null);
@@ -39,17 +24,17 @@ export function ProjectDetailPage() {
       .then((p) => setProject(p))
       .catch((e: unknown) => {
         if ((e as { name?: string })?.name === "AbortError") return;
-        setError("We couldn't load this project right now.");
+        setError(td.error);
       });
     return () => ac.abort();
-  }, [slug]);
+  }, [slug, td.error]);
 
   if (error) {
     return (
       <section className="cf-section">
         <div className="cf-container">
           <div className="cf-alert cf-alert--error">
-            {error} <Link to="/projects">Back to projects</Link>
+            {error} <Link to="/projects">{td.backToProjects}</Link>
           </div>
         </div>
       </section>
@@ -61,7 +46,7 @@ export function ProjectDetailPage() {
       <section className="cf-section">
         <div className="cf-container">
           <div className="cf-alert cf-alert--error">
-            Project not found. <Link to="/projects">Back to projects</Link>
+            {td.notFound} <Link to="/projects">{td.backToProjects}</Link>
           </div>
         </div>
       </section>
@@ -72,67 +57,40 @@ export function ProjectDetailPage() {
     return (
       <section className="cf-hero">
         <div className="cf-container cf-hero__inner">
-          <h1 className="cf-h1">Loading…</h1>
+          <h1 className="cf-h1">{td.loading}</h1>
         </div>
       </section>
     );
   }
+
+  const statusKey = project.status.toLowerCase() as keyof typeof td.statusMeanings;
+  const meaning = td.statusMeanings[statusKey] ?? "";
 
   return (
     <>
       <section className="cf-hero">
         <div className="cf-container cf-hero__inner">
           <div>
-            <Link to="/projects" style={{ color: "rgba(255,255,255,0.7)", fontSize: "0.925rem" }}>
-              &larr; Back to projects
-            </Link>
+            <Link to="/projects" style={{ color: "rgba(255,255,255,0.7)", fontSize: "0.925rem" }}>{td.backToProjects}</Link>
           </div>
           <h1 className="cf-h1">{project.title}</h1>
           <div style={{ display: "flex", gap: "0.5rem", flexWrap: "wrap", alignItems: "center" }}>
             <Badge tone={statusToTone(project.status)}>{project.status}</Badge>
-            <Badge tone={`source-${project.source}`}>
-              {project.source === "espoo" ? "Espoo" : "Helsinki"}
-            </Badge>
-            <span
-              style={{
-                display: "inline-flex",
-                padding: "0.2rem 0.55rem",
-                borderRadius: "var(--cf-radius-full)",
-                background: "rgba(255,255,255,0.15)",
-                color: "#fff",
-                fontWeight: 600,
-                fontSize: "0.8rem"
-              }}
-            >
+            <Badge tone={`source-${project.source}`}>{project.source === "espoo" ? "Espoo" : "Helsinki"}</Badge>
+            <span style={{ display: "inline-flex", padding: "0.2rem 0.55rem", borderRadius: "var(--cf-radius-full)", background: "rgba(255,255,255,0.15)", color: "#fff", fontWeight: 600, fontSize: "0.8rem" }}>
               {project.area}
             </span>
-            {project.topics.map((t) => (
-              <span
-                key={t}
-                style={{
-                  display: "inline-flex",
-                  padding: "0.2rem 0.55rem",
-                  borderRadius: "var(--cf-radius-full)",
-                  background: "rgba(255,255,255,0.1)",
-                  color: "rgba(255,255,255,0.8)",
-                  fontWeight: 600,
-                  fontSize: "0.8rem"
-                }}
-              >
-                {t}
+            {project.topics.map((tp) => (
+              <span key={tp} style={{ display: "inline-flex", padding: "0.2rem 0.55rem", borderRadius: "var(--cf-radius-full)", background: "rgba(255,255,255,0.1)", color: "rgba(255,255,255,0.8)", fontWeight: 600, fontSize: "0.8rem" }}>
+                {tp}
               </span>
             ))}
           </div>
           <p className="cf-lead">{project.description}</p>
           {project.externalUrl ? (
             <div style={{ marginTop: "0.5rem" }}>
-              <a
-                href={project.externalUrl}
-                target="_blank"
-                rel="noreferrer"
-                className="cf-btn cf-btn--white"
-              >
-                View on {project.source === "helsinki" ? "Kerrokantasi" : "original site"} &rarr;
+              <a href={project.externalUrl} target="_blank" rel="noreferrer" className="cf-btn cf-btn--white">
+                {td.viewOriginal} {project.source === "helsinki" ? "Kerrokantasi" : td.originalSite} &rarr;
               </a>
             </div>
           ) : null}
@@ -143,22 +101,18 @@ export function ProjectDetailPage() {
         <div className="cf-container">
           <div className="cf-grid cf-grid--2">
             <Card>
-              <div className="cf-card__title">Status</div>
-              <div className="cf-card__meta" style={{ marginBottom: "0.75rem" }}>
-                Updated {formatDate(project.lastUpdated)}
-              </div>
+              <div className="cf-card__title">{td.status}</div>
+              <div className="cf-card__meta" style={{ marginBottom: "0.75rem" }}>{td.updated} {formatDate(project.lastUpdated)}</div>
               <p style={{ margin: 0, lineHeight: 1.6 }}>
-                <strong>{project.status}:</strong> {statusMeaning(project.status)}
+                <strong>{project.status}:</strong> {meaning}
               </p>
             </Card>
 
             <Card>
-              <div className="cf-card__title">Who's involved</div>
-              <div className="cf-card__meta">City teams and partners working together</div>
+              <div className="cf-card__title">{td.team}</div>
+              <div className="cf-card__meta">{td.teamDesc}</div>
               <ul style={{ margin: 0, paddingLeft: "1.2rem", lineHeight: 1.7 }}>
-                {project.team.map((t) => (
-                  <li key={t}>{t}</li>
-                ))}
+                {project.team.map((tm) => (<li key={tm}>{tm}</li>))}
               </ul>
             </Card>
           </div>
@@ -166,21 +120,11 @@ export function ProjectDetailPage() {
           <div style={{ height: "1.5rem" }} />
 
           <Card>
-            <div className="cf-card__title">About this project</div>
-            {project.imageUrl ? (
-              <img
-                src={project.imageUrl}
-                alt=""
-                className="cf-card__img"
-                style={{ margin: "0.75rem 0" }}
-                loading="lazy"
-              />
-            ) : null}
+            <div className="cf-card__title">{td.aboutProject}</div>
+            {project.imageUrl ? <img src={project.imageUrl} alt="" className="cf-card__img" style={{ margin: "0.75rem 0" }} loading="lazy" /> : null}
             <div style={{ height: "0.5rem" }} />
             {project.body.map((p, i) => (
-              <p key={i} style={{ margin: i === project.body.length - 1 ? 0 : "0 0 1rem", lineHeight: 1.65 }}>
-                {p}
-              </p>
+              <p key={i} style={{ margin: i === project.body.length - 1 ? 0 : "0 0 1rem", lineHeight: 1.65 }}>{p}</p>
             ))}
           </Card>
 
@@ -188,29 +132,21 @@ export function ProjectDetailPage() {
 
           <div className="cf-grid cf-grid--2">
             <Card>
-              <div className="cf-card__title">Timeline</div>
-              <div className="cf-card__meta">Key milestones</div>
+              <div className="cf-card__title">{td.timeline}</div>
+              <div className="cf-card__meta">{td.milestones}</div>
               <ul style={{ margin: 0, paddingLeft: "1.2rem", lineHeight: 1.7 }}>
                 {project.milestones.map((m) => (
-                  <li key={`${m.date}-${m.label}`}>
-                    <strong>{formatDate(m.date)}:</strong> {m.label}
-                  </li>
+                  <li key={`${m.date}-${m.label}`}><strong>{formatDate(m.date)}:</strong> {m.label}</li>
                 ))}
               </ul>
             </Card>
 
             <Card className="cf-card--blue">
-              <div className="cf-card__title">How to give feedback</div>
-              <p className="cf-card__meta" style={{ marginBottom: "0.75rem" }}>
-                Your experience matters — especially local details that don't show up in maps or reports.
-              </p>
+              <div className="cf-card__title">{td.feedbackTitle}</div>
+              <p className="cf-card__meta" style={{ marginBottom: "0.75rem" }}>{td.feedbackDesc}</p>
               <div className="cf-actions" style={{ marginTop: 0 }}>
-                <ButtonLink to="/feedback">
-                  Share feedback on this project
-                </ButtonLink>
-                <ButtonLink to="/contact" variant="ghost">
-                  Contact City Factory
-                </ButtonLink>
+                <ButtonLink to="/feedback">{td.shareFeedback}</ButtonLink>
+                <ButtonLink to="/contact" variant="ghost">{td.contactCF}</ButtonLink>
               </div>
             </Card>
           </div>
