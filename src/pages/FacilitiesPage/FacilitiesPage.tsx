@@ -3,9 +3,18 @@ import { Card } from "../../components/ui/Card";
 import { Button } from "../../components/ui/Button";
 import { supabase } from "../../supabaseClient";
 import { useTranslation } from "../../i18n/useTranslation";
+import spaceWorkshop from "../../utils/physical_space1.jpg";
+import spaceMeeting from "../../utils/physical_space2.jpg";
+import spaceLounge from "../../utils/physical_space3.jpg";
 import "../page.css";
 
 type FacilityOption = "Project room" | "Meeting room" | "Whole space";
+
+const SPACE_COLORS = [
+  { bg: "#FDE6DB", accent: "#c05621" },
+  { bg: "#e8f1fc", accent: "#0050BB" },
+  { bg: "#e6f9ee", accent: "#0d7a3e" },
+] as const;
 
 export function FacilitiesPage() {
   const t = useTranslation();
@@ -67,6 +76,12 @@ export function FacilitiesPage() {
     setSent(true);
   };
 
+  const spaces = [
+    { img: spaceWorkshop, title: tf.projectRoom, desc: tf.projectRoomDesc, capacity: "20", color: SPACE_COLORS[0] },
+    { img: spaceMeeting, title: tf.meetingRoom, desc: tf.meetingRoomDesc, capacity: "5", color: SPACE_COLORS[1] },
+    { img: spaceLounge, title: tf.lobby, desc: tf.lobbyDesc, capacity: null, color: SPACE_COLORS[2] },
+  ];
+
   return (
     <>
       <section className="cf-hero">
@@ -76,69 +91,89 @@ export function FacilitiesPage() {
         </div>
       </section>
 
+      {/* ── Spaces showcase ── */}
       <section className="cf-section">
+        <div className="cf-container">
+          <h2 className="cf-h2">{tf.spacesTitle}</h2>
+
+          <div style={{ display: "grid", gap: "1.5rem" }}>
+            {spaces.map((space, i) => (
+              <div
+                key={i}
+                style={{
+                  display: "grid",
+                  gridTemplateColumns: i % 2 === 0 ? "1.2fr 1fr" : "1fr 1.2fr",
+                  borderRadius: "16px",
+                  overflow: "hidden",
+                  background: space.color.bg,
+                  minHeight: "280px",
+                }}
+              >
+                <div style={{ order: i % 2 === 0 ? 0 : 1 }}>
+                  <img
+                    src={space.img}
+                    alt={space.title}
+                    style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }}
+                    loading="lazy"
+                  />
+                </div>
+                <div style={{
+                  padding: "2rem",
+                  display: "flex",
+                  flexDirection: "column",
+                  justifyContent: "center",
+                  order: i % 2 === 0 ? 1 : 0,
+                }}>
+                  <div style={{
+                    display: "inline-flex",
+                    alignItems: "center",
+                    gap: "0.5rem",
+                    marginBottom: "0.75rem",
+                  }}>
+                    <span style={{
+                      background: space.color.accent,
+                      color: "#fff",
+                      fontSize: "0.75rem",
+                      fontWeight: 600,
+                      padding: "0.2rem 0.6rem",
+                      borderRadius: "999px",
+                    }}>
+                      {space.capacity ? `${space.capacity} people` : "Open space"}
+                    </span>
+                  </div>
+                  <h3 style={{ fontSize: "1.25rem", fontWeight: 600, margin: "0 0 0.5rem", color: "var(--cf-text)" }}>
+                    {space.title}
+                  </h3>
+                  <p style={{ margin: 0, color: "var(--cf-text-secondary)", fontSize: "0.9rem", lineHeight: 1.6 }}>
+                    {space.desc}
+                  </p>
+                </div>
+              </div>
+            ))}
+          </div>
+
+        </div>
+      </section>
+
+      {/* ── Hours + Reservation ── */}
+      <section className="cf-section cf-section--muted">
         <div className="cf-container">
           <div className="cf-grid cf-grid--2" style={{ alignItems: "start" }}>
             <div style={{ display: "grid", gap: "1.25rem" }}>
               <Card>
-                <div className="cf-card__title" style={{ marginBottom: "0.75rem" }}>{tf.spacesTitle}</div>
-                <div className="cf-list">
-                  <div style={{ display: "flex", gap: "0.75rem", alignItems: "flex-start" }}>
-                    <span className="cf-feature-list__icon" aria-hidden="true" style={{ marginTop: "0.15rem" }}>
-                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M3 5c0-1.1.9-2 2-2h14v14H5c-1.1 0-2-.9-2-2V5zm4 2v8h10V7H7zm-2 0H4v8h1V7z" fill="currentColor"/></svg>
-                    </span>
-                    <div>
-                      <strong>{tf.projectRoom}</strong>
-                      <p style={{ margin: "0.25rem 0 0", color: "var(--cf-text-secondary)", fontSize: "0.925rem" }}>{tf.projectRoomDesc}</p>
-                    </div>
-                  </div>
-
-                  <div style={{ display: "flex", gap: "0.75rem", alignItems: "flex-start" }}>
-                    <span className="cf-feature-list__icon" aria-hidden="true" style={{ marginTop: "0.15rem" }}>
-                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M4 6h16v2H4V6zm2 4h12v8H6v-8zm2 2v4h8v-4H8z" fill="currentColor"/></svg>
-                    </span>
-                    <div>
-                      <strong>{tf.meetingRoom}</strong>
-                      <p style={{ margin: "0.25rem 0 0", color: "var(--cf-text-secondary)", fontSize: "0.925rem" }}>{tf.meetingRoomDesc}</p>
-                    </div>
-                  </div>
-
-                  <div style={{ display: "flex", gap: "0.75rem", alignItems: "flex-start" }}>
-                    <span className="cf-feature-list__icon" aria-hidden="true" style={{ marginTop: "0.15rem" }}>
-                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M3 11h18v7c0 1.1-.9 2-2 2H5c-1.1 0-2-.9-2-2v-7zm0-2V6c0-1.1.9-2 2-2h3v5H3zm8 0V4h2v5h-2zm4 0V4h3c1.1 0 2 .9 2 2v3h-5z" fill="currentColor"/></svg>
-                    </span>
-                    <div>
-                      <strong>{tf.lobby}</strong>
-                      <p style={{ margin: "0.25rem 0 0", color: "var(--cf-text-secondary)", fontSize: "0.925rem" }}>{tf.lobbyDesc}</p>
-                    </div>
-                  </div>
-
-                  <div style={{ display: "flex", gap: "0.75rem", alignItems: "flex-start" }}>
-                    <span className="cf-feature-list__icon" aria-hidden="true" style={{ marginTop: "0.15rem" }}>
-                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M4 4h16v4h-2v12H6V8H4V4zm4 6v8h8v-8H8zm2-4v2h4V6h-4z" fill="currentColor"/></svg>
-                    </span>
-                    <div>
-                      <strong>{tf.upperFloor}</strong>
-                      <p style={{ margin: "0.25rem 0 0", color: "var(--cf-text-secondary)", fontSize: "0.925rem" }}>{tf.upperFloorDesc}</p>
-                    </div>
-                  </div>
-                </div>
-              </Card>
-
-              <Card>
                 <div className="cf-card__title" style={{ marginBottom: "0.75rem" }}>{tf.hoursTitle}</div>
                 <p className="cf-card__meta" style={{ marginBottom: "0.75rem" }}>{tf.hoursNote}</p>
-                <dl style={{ display: "grid", gridTemplateColumns: "minmax(0, 1fr) minmax(0, 1fr)", rowGap: "0.35rem" }}>
-                  <dt style={{ fontWeight: 600 }}>{tf.monThu}</dt>
+                <dl style={{ display: "grid", gridTemplateColumns: "minmax(0, 1fr) minmax(0, 1fr)", rowGap: "0.5rem", fontSize: "0.9rem" }}>
+                  <dt style={{ fontWeight: 500 }}>{tf.monThu}</dt>
                   <dd style={{ margin: 0, textAlign: "right" }}>09:00–20:00</dd>
-                  <dt style={{ fontWeight: 600 }}>{tf.fri}</dt>
+                  <dt style={{ fontWeight: 500 }}>{tf.fri}</dt>
                   <dd style={{ margin: 0, textAlign: "right" }}>09:00–18:00</dd>
-                  <dt style={{ fontWeight: 600 }}>{tf.sat}</dt>
+                  <dt style={{ fontWeight: 500 }}>{tf.sat}</dt>
                   <dd style={{ margin: 0, textAlign: "right" }}>10:00–16:00 {tf.satNote}</dd>
-                  <dt style={{ fontWeight: 600 }}>{tf.sun}</dt>
+                  <dt style={{ fontWeight: 500 }}>{tf.sun}</dt>
                   <dd style={{ margin: 0, textAlign: "right" }}>{tf.sunNote}</dd>
                 </dl>
-                <p style={{ marginTop: "0.75rem", fontSize: "0.9rem", color: "var(--cf-text-secondary)" }}>{tf.eveningNote}</p>
+                <p style={{ marginTop: "0.75rem", fontSize: "0.85rem", color: "var(--cf-text-muted)" }}>{tf.eveningNote}</p>
               </Card>
             </div>
 
@@ -150,7 +185,7 @@ export function FacilitiesPage() {
               {error ? <div className="cf-alert cf-alert--error" style={{ marginBottom: "0.75rem" }}>{error}</div> : null}
 
               {!sent ? (
-                <form onSubmit={onSubmit} style={{ display: "grid", gap: "1rem" }}>
+                <form onSubmit={onSubmit} style={{ display: "grid", gap: "0.85rem" }}>
                   <div className="cf-field">
                     <label className="cf-label" htmlFor="facility-name">{tf.nameLabel}</label>
                     <input id="facility-name" className="cf-input" value={name} onChange={(e) => setName(e.target.value)} autoComplete="name" />
@@ -187,7 +222,7 @@ export function FacilitiesPage() {
                   </div>
                   <div className="cf-field">
                     <label className="cf-label" htmlFor="facility-notes">{tf.descLabel}</label>
-                    <textarea id="facility-notes" className="cf-textarea" value={notes} onChange={(e) => setNotes(e.target.value)} rows={4} />
+                    <textarea id="facility-notes" className="cf-textarea" value={notes} onChange={(e) => setNotes(e.target.value)} rows={3} />
                   </div>
                   <Button type="submit" className="cf-btn--lg">{tf.submit}</Button>
                 </form>

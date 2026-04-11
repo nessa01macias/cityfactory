@@ -43,7 +43,6 @@ export function Layout() {
       { to: "/projects", label: t.nav.projects },
       { to: "/get-involved", label: t.nav.getInvolved },
       { to: "/facilities", label: t.nav.facilities },
-      { to: "/feedback", label: t.nav.feedback },
       { to: "/contact", label: t.nav.contact },
     ],
     [t]
@@ -170,7 +169,6 @@ export function Layout() {
                 <div className="cf-footer__links-heading">{t.footer.participate}</div>
                 <div className="cf-footer__links">
                   <NavLink to="/get-involved">{t.nav.getInvolved}</NavLink>
-                  <NavLink to="/feedback">{t.nav.feedback}</NavLink>
                   <NavLink to="/contact">{t.nav.contact}</NavLink>
                 </div>
               </div>

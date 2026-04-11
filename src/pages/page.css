@@ -3,7 +3,7 @@
    ============================================================ */
 
 .cf-hero {
-  padding: 2.5rem 0 2rem;
+  padding: 2rem 0 1.75rem;
   background: var(--espoo-blue);
   color: #fff;
   position: relative;
@@ -22,7 +22,7 @@
 
 /* ── Home hero — extra tall with decorative blobs ── */
 .cf-hero--home {
-  padding: 3.5rem 0 4.5rem;
+  padding: 3rem 0 3.5rem;
   background: var(--espoo-night);
   background-image:
     radial-gradient(ellipse 80% 60% at 75% 20%, rgba(0, 80, 187, 0.6), transparent),
@@ -32,7 +32,7 @@
 
 @media (min-width: 860px) {
   .cf-hero--home {
-    padding: 4rem 0 5rem;
+    padding: 3.5rem 0 4rem;
   }
 }
 
@@ -331,41 +331,61 @@
 
 .cf-pipeline {
   display: flex;
-  gap: 0;
+  align-items: flex-start;
   overflow-x: auto;
-  padding-bottom: 0.5rem;
+  padding: 0.5rem 0 1rem;
+  position: relative;
 }
 
-.cf-pipeline__step { display: flex; align-items: center; gap: 0; flex-shrink: 0; }
-
-.cf-pipeline__label {
+.cf-pipeline__step {
   display: flex;
+  flex-direction: column;
   align-items: center;
-  gap: 0.5rem;
-  padding: 0.5rem 1rem;
-  background: var(--cf-primary-light);
-  color: var(--cf-primary);
-  font-weight: 650;
-  font-size: 0.875rem;
-  border-radius: var(--cf-radius-full);
-  white-space: nowrap;
+  flex: 1;
+  min-width: 0;
+  position: relative;
+  text-align: center;
+}
+
+/* Connecting line between steps */
+.cf-pipeline__step:not(:last-child)::after {
+  content: "";
+  position: absolute;
+  top: 14px;
+  left: calc(50% + 16px);
+  right: calc(-50% + 16px);
+  height: 2px;
+  background: var(--cf-border);
 }
 
 .cf-pipeline__num {
-  width: 22px;
-  height: 22px;
+  width: 28px;
+  height: 28px;
   border-radius: 50%;
   background: var(--cf-primary);
   color: #fff;
-  display: inline-flex;
+  display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 0.75rem;
+  font-size: 0.8rem;
   font-weight: 700;
   flex-shrink: 0;
+  position: relative;
+  z-index: 1;
 }
 
-.cf-pipeline__arrow { color: var(--cf-text-muted); padding: 0 0.35rem; font-size: 1.1rem; }
+.cf-pipeline__label {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.4rem;
+  font-weight: 600;
+  font-size: 0.8rem;
+  color: var(--cf-text-secondary);
+  white-space: nowrap;
+}
+
+.cf-pipeline__arrow { display: none; }
 
 /* ============================================================
    Feature List

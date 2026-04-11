@@ -160,7 +160,9 @@ export function ProjectsPage() {
                     <Badge tone={statusToTone(p.status)}>{p.status}</Badge>
                     <div style={{ display: "flex", alignItems: "center", gap: "0.4rem" }}>
                       <Badge tone={`source-${p.source}`}>{p.source === "espoo" ? "Espoo" : "Helsinki"}</Badge>
-                      <span style={{ fontSize: "0.8rem", color: "var(--cf-text-muted)" }}>{p.area}</span>
+                      {p.area !== "Helsinki" && p.area !== "Espoo" && (
+                        <span style={{ fontSize: "0.8rem", color: "var(--cf-text-muted)" }}>{p.area}</span>
+                      )}
                     </div>
                   </div>
                   <div className="cf-card__title">{p.title}</div>
