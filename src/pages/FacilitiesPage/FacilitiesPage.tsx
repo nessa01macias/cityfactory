@@ -100,14 +100,8 @@ export function FacilitiesPage() {
             {spaces.map((space, i) => (
               <div
                 key={i}
-                style={{
-                  display: "grid",
-                  gridTemplateColumns: i % 2 === 0 ? "1.2fr 1fr" : "1fr 1.2fr",
-                  borderRadius: "16px",
-                  overflow: "hidden",
-                  background: space.color.bg,
-                  minHeight: "280px",
-                }}
+                className={i % 2 === 0 ? "cf-split cf-split--wide-left" : "cf-split cf-split--wide-right"}
+                style={{ background: space.color.bg }}
               >
                 <div style={{ order: i % 2 === 0 ? 0 : 1 }}>
                   <img
@@ -155,37 +149,28 @@ export function FacilitiesPage() {
         </div>
       </section>
 
-      {/* ── Hours + Reservation ── */}
+      {/* ── Reservation ── */}
       <section className="cf-section cf-section--muted">
         <div className="cf-container">
-          <div className="cf-grid cf-grid--2" style={{ alignItems: "start" }}>
-            <div style={{ display: "grid", gap: "1.25rem" }}>
-              <Card>
-                <div className="cf-card__title" style={{ marginBottom: "0.75rem" }}>{tf.hoursTitle}</div>
-                <p className="cf-card__meta" style={{ marginBottom: "0.75rem" }}>{tf.hoursNote}</p>
-                <dl style={{ display: "grid", gridTemplateColumns: "minmax(0, 1fr) minmax(0, 1fr)", rowGap: "0.5rem", fontSize: "0.9rem" }}>
-                  <dt style={{ fontWeight: 500 }}>{tf.monThu}</dt>
-                  <dd style={{ margin: 0, textAlign: "right" }}>09:00–20:00</dd>
-                  <dt style={{ fontWeight: 500 }}>{tf.fri}</dt>
-                  <dd style={{ margin: 0, textAlign: "right" }}>09:00–18:00</dd>
-                  <dt style={{ fontWeight: 500 }}>{tf.sat}</dt>
-                  <dd style={{ margin: 0, textAlign: "right" }}>10:00–16:00 {tf.satNote}</dd>
-                  <dt style={{ fontWeight: 500 }}>{tf.sun}</dt>
-                  <dd style={{ margin: 0, textAlign: "right" }}>{tf.sunNote}</dd>
-                </dl>
-                <p style={{ marginTop: "0.75rem", fontSize: "0.85rem", color: "var(--cf-text-muted)" }}>{tf.eveningNote}</p>
-              </Card>
+          <Card>
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: "0.5rem", marginBottom: "1rem" }}>
+              <div>
+                <div className="cf-card__title" style={{ marginBottom: "0.15rem" }}>{tf.reserveTitle}</div>
+                <div className="cf-card__meta" style={{ margin: 0 }}>{tf.reserveLead}</div>
+              </div>
+              <div style={{ display: "flex", flexWrap: "wrap", gap: "0.5rem", fontSize: "0.8rem", color: "var(--cf-text-muted)" }}>
+                <span><strong>{tf.monThu}</strong> 09–20</span>
+                <span><strong>{tf.fri}</strong> 09–18</span>
+                <span><strong>{tf.sat}</strong> 10–16</span>
+              </div>
             </div>
 
-            <Card>
-              <div className="cf-card__title" style={{ marginBottom: "0.25rem" }}>{tf.reserveTitle}</div>
-              <div className="cf-card__meta" style={{ marginBottom: "1rem" }}>{tf.reserveLead}</div>
+            {sent ? <div className="cf-alert cf-alert--success">{tf.reserveSuccess}</div> : null}
+            {error ? <div className="cf-alert cf-alert--error" style={{ marginBottom: "0.75rem" }}>{error}</div> : null}
 
-              {sent ? <div className="cf-alert cf-alert--success">{tf.reserveSuccess}</div> : null}
-              {error ? <div className="cf-alert cf-alert--error" style={{ marginBottom: "0.75rem" }}>{error}</div> : null}
-
-              {!sent ? (
-                <form onSubmit={onSubmit} style={{ display: "grid", gap: "0.85rem" }}>
+            {!sent ? (
+              <form onSubmit={onSubmit}>
+                <div className="cf-grid cf-grid--2" style={{ gap: "0.75rem" }}>
                   <div className="cf-field">
                     <label className="cf-label" htmlFor="facility-name">{tf.nameLabel}</label>
                     <input id="facility-name" className="cf-input" value={name} onChange={(e) => setName(e.target.value)} autoComplete="name" />
@@ -220,15 +205,17 @@ export function FacilitiesPage() {
                       <input id="facility-end-time" className="cf-input" type="time" value={endTime} onChange={(e) => setEndTime(e.target.value)} />
                     </div>
                   </div>
-                  <div className="cf-field">
-                    <label className="cf-label" htmlFor="facility-notes">{tf.descLabel}</label>
-                    <textarea id="facility-notes" className="cf-textarea" value={notes} onChange={(e) => setNotes(e.target.value)} rows={3} />
-                  </div>
+                </div>
+                <div className="cf-field" style={{ marginTop: "0.75rem" }}>
+                  <label className="cf-label" htmlFor="facility-notes">{tf.descLabel}</label>
+                  <textarea id="facility-notes" className="cf-textarea" value={notes} onChange={(e) => setNotes(e.target.value)} rows={3} />
+                </div>
+                <div style={{ marginTop: "0.75rem" }}>
                   <Button type="submit" className="cf-btn--lg">{tf.submit}</Button>
-                </form>
-              ) : null}
-            </Card>
-          </div>
+                </div>
+              </form>
+            ) : null}
+          </Card>
         </div>
       </section>
     </>

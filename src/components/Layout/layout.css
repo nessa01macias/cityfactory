@@ -221,7 +221,7 @@
 }
 
 .cf-footer .cf-brand__logo {
-  filter: brightness(0) invert(1);
+  border-radius: 6px;
 }
 
 .cf-footer .cf-brand__sub {

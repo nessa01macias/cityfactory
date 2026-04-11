@@ -23,13 +23,11 @@ const ESPOO_BOUNDS: L.LatLngBoundsExpression = [
 ];
 
 /* ── Category config ── */
-const CATEGORY_VALUES: PinCategory[] = ["thought", "idea", "issue", "love", "memory"];
+const CATEGORY_VALUES: PinCategory[] = ["idea", "issue", "recommendation"];
 const CATEGORY_COLORS: Record<PinCategory, string> = {
-  thought: "#0050BB",
   idea: "#FFDC47",
   issue: "#FF4F57",
-  love: "#FCA5C7",
-  memory: "#9D85E5",
+  recommendation: "#8AC987",
 };
 
 function getCategoryColor(cat: string): string {
@@ -75,12 +73,23 @@ export function CommunityMap() {
 
   const [pins, setPins] = useState<MapPin[]>([]);
   const [loading, setLoading] = useState(true);
+  const [hiddenCategories, setHiddenCategories] = useState<Set<PinCategory>>(new Set());
+
+  const toggleCategory = (cat: PinCategory) => {
+    setHiddenCategories((prev) => {
+      const next = new Set(prev);
+      if (next.has(cat)) next.delete(cat); else next.add(cat);
+      return next;
+    });
+  };
+
+  const visiblePins = pins.filter((p) => !hiddenCategories.has(p.category as PinCategory));
 
   // Add mode
   const [addMode, setAddMode] = useState(false);
   const [newPinCoords, setNewPinCoords] = useState<{ lat: number; lng: number } | null>(null);
   const [message, setMessage] = useState("");
-  const [category, setCategory] = useState<PinCategory>("thought");
+  const [category, setCategory] = useState<PinCategory>("idea");
   const [submitting, setSubmitting] = useState(false);
   const [cooldown, setCooldown] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
@@ -131,7 +140,7 @@ export function CommunityMap() {
       });
       setNewPinCoords(null);
       setMessage("");
-      setCategory("thought");
+      setCategory("idea");
       setAddMode(false);
       setShowSuccess(true);
       setCooldown(true);
@@ -146,7 +155,7 @@ export function CommunityMap() {
     setAddMode(false);
     setNewPinCoords(null);
     setMessage("");
-    setCategory("thought");
+    setCategory("idea");
   };
 
   const dateLocale = language === "FI" ? "fi-FI" : "en-GB";
@@ -192,7 +201,7 @@ export function CommunityMap() {
               });
             }}
           >
-            {pins.map((pin) => (
+            {visiblePins.map((pin) => (
               <Marker
                 key={pin.id}
                 position={[pin.lat, pin.lng]}
@@ -266,14 +275,39 @@ export function CommunityMap() {
           )}
         </MapContainer>
 
-        {/* Legend overlay */}
-        <div className="cf-voicemap__legend">
-          {CATEGORY_VALUES.map((val) => (
-            <span key={val} className="cf-voicemap__legend-item">
-              <span className="cf-voicemap__legend-dot" style={{ background: getCategoryColor(val) }} />
-              {categoryLabel(val)}
-            </span>
-          ))}
+        {/* Filter chips */}
+        <div className="cf-voicemap__legend" style={{ gap: "0.4rem", padding: "0.4rem 0.6rem", flexDirection: "column", alignItems: "flex-start" }}>
+          <span style={{ fontSize: "0.7rem", textTransform: "uppercase", letterSpacing: "0.05em", color: "var(--cf-text-muted)", fontWeight: 600 }}>
+            Filter
+          </span>
+          <div style={{ display: "flex", gap: "0.35rem", flexWrap: "wrap" }}>
+            {CATEGORY_VALUES.map((val) => {
+              const isActive = !hiddenCategories.has(val);
+              return (
+                <button
+                  key={val}
+                  type="button"
+                  onClick={() => toggleCategory(val)}
+                  style={{
+                    cursor: "pointer",
+                    border: "none",
+                    padding: "0.25rem 0.55rem",
+                    borderRadius: "999px",
+                    background: isActive ? getCategoryColor(val) : "var(--cf-surface)",
+                    color: isActive ? (val === "idea" ? "#333" : "#fff") : "var(--cf-text-muted)",
+                    fontWeight: 600,
+                    fontSize: "0.75rem",
+                    transition: "all 0.15s",
+                    display: "inline-flex",
+                    alignItems: "center",
+                    gap: "0.25rem",
+                  }}
+                >
+                  {categoryLabel(val)}
+                </button>
+              );
+            })}
+          </div>
         </div>
 
         {/* Add button (when not in add mode) */}

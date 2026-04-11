@@ -83,7 +83,7 @@ export function GetInvolvedPage() {
       </section>
 
       {/* ── Community Voice Map ── */}
-      <div className="cf-voicemap-page" style={{ height: "60vh" }}>
+      <div className="cf-voicemap-embed">
         <CommunityMap />
       </div>
 
@@ -114,76 +114,102 @@ export function GetInvolvedPage() {
           ) : (
             <>
               {error ? <div className="cf-alert cf-alert--error" style={{ marginBottom: "1rem" }}>{error}</div> : null}
-              <form onSubmit={submit} className="cf-grid cf-grid--2" style={{ alignItems: "start" }}>
+              <form onSubmit={submit}>
                 <Card>
-                  <div className="cf-field">
-                    <label className="cf-label" htmlFor="message">{tf.messageRequired}</label>
-                    <textarea className="cf-textarea" id="message" value={message} onChange={(e) => setMessage(e.target.value)} placeholder={tf.messagePlaceholder} />
-                    <div className="cf-help">{messageHint}</div>
-                  </div>
+                  {/* Row 1: Message + Type */}
+                  <div className="cf-grid cf-grid--2" style={{ alignItems: "start" }}>
+                    <div className="cf-field">
+                      <label className="cf-label" htmlFor="message">{tf.messageRequired}</label>
+                      <textarea className="cf-textarea" id="message" value={message} onChange={(e) => setMessage(e.target.value)} placeholder={tf.messagePlaceholder} style={{ minHeight: "120px" }} />
+                      <div className="cf-help">{messageHint}</div>
+                    </div>
 
-                  <div style={{ height: "0.75rem" }} />
+                    <div style={{ display: "grid", gap: "0.75rem" }}>
+                      <div className="cf-field">
+                        <div className="cf-label">{tf.typeLabel}</div>
+                        <div style={{ display: "flex", flexWrap: "wrap", gap: "0.4rem", marginTop: "0.15rem" }}>
+                          {(["Idea", "Issue", "Question", "Other"] as const).map((ft) => (
+                            <button
+                              key={ft}
+                              type="button"
+                              onClick={() => setType(ft)}
+                              style={{
+                                padding: "0.35rem 0.75rem",
+                                borderRadius: "999px",
+                                border: type === ft ? "1.5px solid var(--cf-primary)" : "1.5px solid var(--cf-border)",
+                                background: type === ft ? "var(--cf-primary-light)" : "transparent",
+                                color: type === ft ? "var(--cf-primary)" : "var(--cf-text-secondary)",
+                                fontWeight: type === ft ? 600 : 400,
+                                fontSize: "0.85rem",
+                                cursor: "pointer",
+                                transition: "all 0.15s",
+                              }}
+                            >
+                              {ft}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
 
-                  <div className="cf-field">
-                    <div className="cf-label">{tf.typeLabel}</div>
-                    <div style={{ display: "grid", gap: "0.4rem", marginTop: "0.15rem" }}>
-                      {(["Idea", "Issue", "Question", "Other"] as const).map((ft) => (
-                        <label key={ft} style={{ display: "flex", gap: "0.5rem", alignItems: "center", cursor: "pointer", fontSize: "0.9rem" }}>
-                          <input type="radio" name="type" value={ft} checked={type === ft} onChange={() => setType(ft)} />
-                          {typeLabels[ft]}
-                        </label>
-                      ))}
+                      <div className="cf-field">
+                        <label className="cf-label" htmlFor="area">{tf.areaHint}</label>
+                        <select className="cf-select" id="area" value={area} onChange={(e) => setArea(e.target.value)}>
+                          {areaLabels.map((a) => (<option key={a} value={a}>{a}</option>))}
+                        </select>
+                        {area === tf.areas.other ? (
+                          <input className="cf-input" value={areaOther} onChange={(e) => setAreaOther(e.target.value)} placeholder={tf.areaPlaceholder} style={{ marginTop: "0.4rem" }} />
+                        ) : null}
+                      </div>
                     </div>
                   </div>
 
-                  <div style={{ height: "0.75rem" }} />
+                  <hr style={{ border: "none", borderTop: "1px solid var(--cf-border-light)", margin: "1rem 0" }} />
 
-                  <div className="cf-field">
-                    <div className="cf-label">{tf.topicLabel}</div>
-                    <div className="cf-help">{tf.topicHint}</div>
-                    <div style={{ display: "grid", gap: "0.3rem", marginTop: "0.15rem" }}>
-                      {topicLabels.map((tl) => (
-                        <label key={tl} style={{ display: "flex", gap: "0.5rem", alignItems: "center", cursor: "pointer", fontSize: "0.9rem" }}>
-                          <input type="checkbox" checked={topics.includes(tl)} onChange={() => toggleTopic(tl)} />
-                          {tl}
-                        </label>
-                      ))}
+                  {/* Row 2: Topics as chips + contact info */}
+                  <div className="cf-grid cf-grid--2" style={{ alignItems: "start" }}>
+                    <div className="cf-field">
+                      <div className="cf-label">{tf.topicLabel} <span style={{ fontWeight: 400, color: "var(--cf-text-muted)" }}>({tf.topicHint})</span></div>
+                      <div style={{ display: "flex", flexWrap: "wrap", gap: "0.35rem", marginTop: "0.15rem" }}>
+                        {topicLabels.map((tl) => (
+                          <button
+                            key={tl}
+                            type="button"
+                            onClick={() => toggleTopic(tl)}
+                            style={{
+                              padding: "0.3rem 0.65rem",
+                              borderRadius: "999px",
+                              border: topics.includes(tl) ? "1.5px solid var(--cf-primary)" : "1.5px solid var(--cf-border)",
+                              background: topics.includes(tl) ? "var(--cf-primary-light)" : "transparent",
+                              color: topics.includes(tl) ? "var(--cf-primary)" : "var(--cf-text-secondary)",
+                              fontWeight: topics.includes(tl) ? 600 : 400,
+                              fontSize: "0.8rem",
+                              cursor: "pointer",
+                              transition: "all 0.15s",
+                            }}
+                          >
+                            {tl}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+
+                    <div style={{ display: "grid", gap: "0.6rem" }}>
+                      <div className="cf-field">
+                        <label className="cf-label" htmlFor="email">{tf.emailLabel}</label>
+                        <input className="cf-input" id="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder={tf.emailPlaceholder} inputMode="email" autoComplete="email" />
+                      </div>
+                      <div className="cf-field">
+                        <label className="cf-label" htmlFor="name">{tf.nameLabel}</label>
+                        <input className="cf-input" id="name" value={name} onChange={(e) => setName(e.target.value)} placeholder={tf.namePlaceholder} autoComplete="name" />
+                      </div>
                     </div>
                   </div>
-                </Card>
 
-                <Card>
-                  <div className="cf-field">
-                    <label className="cf-label" htmlFor="area">{tf.areaHint}</label>
-                    <select className="cf-select" id="area" value={area} onChange={(e) => setArea(e.target.value)}>
-                      {areaLabels.map((a) => (<option key={a} value={a}>{a}</option>))}
-                    </select>
-                    {area === tf.areas.other ? (
-                      <input className="cf-input" value={areaOther} onChange={(e) => setAreaOther(e.target.value)} placeholder={tf.areaPlaceholder} style={{ marginTop: "0.5rem" }} />
-                    ) : null}
-                  </div>
-
-                  <div style={{ height: "0.75rem" }} />
-
-                  <div className="cf-field">
-                    <label className="cf-label" htmlFor="email">{tf.emailLabel}</label>
-                    <input className="cf-input" id="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder={tf.emailPlaceholder} inputMode="email" autoComplete="email" />
-                  </div>
-
-                  <div style={{ height: "0.75rem" }} />
-
-                  <div className="cf-field">
-                    <label className="cf-label" htmlFor="name">{tf.nameLabel}</label>
-                    <input className="cf-input" id="name" value={name} onChange={(e) => setName(e.target.value)} placeholder={tf.namePlaceholder} autoComplete="name" />
-                  </div>
-
-                  <div style={{ height: "1rem" }} />
-
-                  <Button type="submit" className="cf-btn--lg" style={{ width: "100%" }}>{tf.submit}</Button>
-
-                  <div style={{ height: "0.5rem" }} />
-                  <div className="cf-help" style={{ textAlign: "center" }}>
-                    <a href="/feedback/status">{tf.trackLink}</a>
+                  <div style={{ marginTop: "1rem", display: "flex", alignItems: "center", gap: "1rem", justifyContent: "space-between" }}>
+                    <div className="cf-help">
+                      <a href="/feedback/status">{tf.trackLink}</a>
+                    </div>
+                    <Button type="submit" className="cf-btn--lg">{tf.submit}</Button>
                   </div>
                 </Card>
               </form>

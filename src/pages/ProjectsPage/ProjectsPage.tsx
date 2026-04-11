@@ -19,6 +19,7 @@ export function ProjectsPage() {
   const t = useTranslation();
   const tp = t.projects;
 
+  const [activeStage, setActiveStage] = useState<number | null>(null);
   const [projects, setProjects] = useState<Project[] | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [status, setStatus] = useState<(typeof STATUS_KEYS)[number]>("All");
@@ -82,20 +83,71 @@ export function ProjectsPage() {
           <h2 className="cf-h2">{tp.pipelineTitle}</h2>
 
           <div className="cf-pipeline" role="list" aria-label="Project stages">
-            {PIPELINE_NUMS.map((num, i) => (
-              <div className="cf-pipeline__step" key={num} role="listitem">
-                <span className="cf-pipeline__label">
-                  <span className="cf-pipeline__num">{num}</span>
-                  {tp.stages[PIPELINE_KEYS[i]]}
-                </span>
-                {i < PIPELINE_NUMS.length - 1 ? (
-                  <span className="cf-pipeline__arrow" aria-hidden="true">&rarr;</span>
-                ) : null}
-              </div>
-            ))}
+            {PIPELINE_NUMS.map((num, i) => {
+              const isActive = activeStage === i;
+              const isPast = activeStage !== null && i <= activeStage;
+              return (
+                <div
+                  className="cf-pipeline__step"
+                  key={num}
+                  role="listitem"
+                  onClick={() => setActiveStage(isActive ? null : i)}
+                  style={{ cursor: "pointer" }}
+                >
+                  <span className="cf-pipeline__label">
+                    <span
+                      className="cf-pipeline__num"
+                      style={{
+                        background: isActive
+                          ? "var(--espoo-night)"
+                          : isPast
+                            ? "var(--cf-primary)"
+                            : "var(--cf-primary)",
+                        transform: isActive ? "scale(1.25)" : "scale(1)",
+                        boxShadow: isActive
+                          ? "0 0 0 6px rgba(0, 80, 187, 0.15), 0 4px 20px rgba(1, 33, 105, 0.3)"
+                          : undefined,
+                      }}
+                    >
+                      {isActive ? (
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                          <path d="M20 6L9 17l-5-5" stroke="#fff" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
+                        </svg>
+                      ) : num}
+                    </span>
+                    <span style={{
+                      color: isActive ? "var(--cf-primary)" : "var(--cf-text-secondary)",
+                      fontWeight: isActive ? 600 : 500,
+                      transition: "all 0.25s",
+                    }}>
+                      {tp.stages[PIPELINE_KEYS[i]]}
+                    </span>
+                  </span>
+                </div>
+              );
+            })}
           </div>
 
-          <p style={{ margin: "1rem 0 0", color: "var(--cf-text-secondary)", maxWidth: "70ch" }}>{tp.pipelineNote}</p>
+          {activeStage !== null ? (
+            <div className="cf-pipeline-info" key={activeStage} style={{
+              margin: "0.5rem 0 0",
+              padding: "1.25rem 1.5rem",
+              background: "linear-gradient(135deg, var(--cf-primary-light) 0%, #f3f8ff 100%)",
+              borderRadius: "12px",
+              width: "100%",
+              fontSize: "0.9rem",
+              lineHeight: 1.65,
+              color: "var(--cf-text-secondary)",
+              border: "1px solid rgba(0, 80, 187, 0.1)",
+            }}>
+              <div style={{ fontWeight: 600, color: "var(--cf-text)", marginBottom: "0.3rem", fontSize: "0.95rem" }}>
+                {tp.stages[PIPELINE_KEYS[activeStage]]}
+              </div>
+              {tp.stageDescs[PIPELINE_KEYS[activeStage]]}
+            </div>
+          ) : (
+            <p style={{ margin: "0.75rem 0 0", color: "var(--cf-text-muted)", fontSize: "0.85rem" }}>{tp.pipelineNote}</p>
+          )}
 
           <div style={{ height: "2rem" }} />
 

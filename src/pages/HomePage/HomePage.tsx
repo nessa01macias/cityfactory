@@ -9,6 +9,8 @@ import { fetchAllProjects, type Project } from "../../api/projects";
 import { statusToTone } from "../../utils/projectStatus";
 import { useTranslation } from "../../i18n/useTranslation";
 import { useLanguage } from "../../state/language";
+import brochureImg from "../../utils/BrochurePicture_Sponsor_TeamName.png";
+import loungeImg from "../../utils/physical_space3.jpg";
 import "../page.css";
 
 /* ── SVG Wave Divider ── */
@@ -125,36 +127,26 @@ export function HomePage() {
 
       <WaveDivider from="var(--espoo-night)" to="#ffffff" />
 
-      {/* VOICE MAP CTA */}
-      <section className="cf-section" style={{ paddingTop: "2.5rem", paddingBottom: "2.5rem" }}>
+      {/* VOICE MAP CTA — with brochure image */}
+      <section className="cf-section" style={{ paddingTop: "2rem", paddingBottom: "2rem" }}>
         <div className="cf-container">
           <div style={{
-            background: "linear-gradient(135deg, var(--espoo-blue), var(--espoo-night))",
-            borderRadius: "var(--cf-radius-xl)",
-            padding: "2.5rem 2rem",
-            display: "flex",
-            alignItems: "center",
-            gap: "2rem",
-            flexWrap: "wrap",
-            justifyContent: "space-between",
-            color: "#fff",
-            position: "relative",
-            overflow: "hidden",
-          }}>
-            <div aria-hidden="true" style={{ position: "absolute", top: "-30%", right: "-5%", width: 200, height: 200, borderRadius: "50%", background: "rgba(255, 220, 71, 0.1)" }} />
-            <div aria-hidden="true" style={{ position: "absolute", bottom: "-20%", left: "10%", width: 150, height: 150, borderRadius: "50%", background: "rgba(252, 165, 199, 0.1)" }} />
-            <div style={{ flex: 1, minWidth: "280px", position: "relative", zIndex: 1 }}>
-              <div style={{ display: "flex", alignItems: "center", gap: "0.75rem", marginBottom: "0.5rem" }}>
-                <div style={{ width: 44, height: 44, borderRadius: "50%", background: "rgba(255,255,255,0.15)", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z" fill="currentColor"/></svg>
-                </div>
-                <h2 style={{ fontSize: "1.4rem", fontWeight: 800, margin: 0, letterSpacing: "-0.02em" }}>{t.communityMap.homeCta}</h2>
+          }} className="cf-split">
+            <img src={brochureImg} alt="" style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} loading="lazy" />
+            <div style={{
+              background: "linear-gradient(135deg, var(--espoo-blue), var(--espoo-night))",
+              padding: "2rem",
+              display: "flex",
+              flexDirection: "column",
+              justifyContent: "center",
+              color: "#fff",
+            }}>
+              <h2 style={{ fontSize: "1.25rem", fontWeight: 600, margin: "0 0 0.5rem" }}>{t.communityMap.homeCta}</h2>
+              <p style={{ margin: "0 0 1.25rem", fontSize: "0.9rem", opacity: 0.8, lineHeight: 1.6 }}>{t.communityMap.homeCtaDesc}</p>
+              <div>
+                <ButtonLink to="/get-involved" variant="white">{t.communityMap.homeCta}</ButtonLink>
               </div>
-              <p style={{ margin: 0, fontSize: "1.05rem", opacity: 0.85, lineHeight: 1.6, maxWidth: "48ch" }}>{t.communityMap.homeCtaDesc}</p>
             </div>
-            <ButtonLink to="/get-involved" variant="white" className="cf-btn--lg" style={{ flexShrink: 0, position: "relative", zIndex: 1 }}>
-              {t.communityMap.homeCta}
-            </ButtonLink>
           </div>
         </div>
       </section>
@@ -232,22 +224,29 @@ export function HomePage() {
         </div>
       </section>
 
-      <WaveDivider from="#ffffff" to="var(--espoo-powder)" />
-
-      {/* CTA BANNER */}
-      <section className="cf-section--powder cf-cta-banner">
-        <div className="cf-container cf-cta-banner__inner">
-          <div className="cf-kicker cf-kicker--blue" style={{ justifyContent: "center", marginBottom: "0.75rem" }}>{h.ctaTitle}</div>
-          <h2 className="cf-h2" style={{ maxWidth: "22ch", margin: "0 auto 1rem" }}>{h.ctaSubtitle}</h2>
-          <p className="cf-lead" style={{ margin: "0 auto 1.5rem", textAlign: "center", maxWidth: "50ch" }}>{h.ctaDesc}</p>
-          <div className="cf-actions" style={{ justifyContent: "center" }}>
-            <ButtonLink to="/get-involved" className="cf-btn--lg">{h.ctaParticipate}</ButtonLink>
-            <ButtonLink to="/contact" variant="secondary" className="cf-btn--lg">{h.ctaContact}</ButtonLink>
+      {/* CTA BANNER — with space photo */}
+      <section style={{ position: "relative", overflow: "hidden" }}>
+        <div className="cf-split">
+          <div style={{
+            background: "var(--espoo-powder)",
+            padding: "2rem",
+            display: "flex",
+            flexDirection: "column",
+            justifyContent: "center",
+            alignItems: "flex-start",
+          }}>
+            <div className="cf-container">
+              <h2 className="cf-h2">{h.ctaSubtitle}</h2>
+              <p className="cf-lead" style={{ marginBottom: "1.25rem" }}>{h.ctaDesc}</p>
+              <div className="cf-actions">
+                <ButtonLink to="/get-involved" className="cf-btn--lg">{h.ctaParticipate}</ButtonLink>
+                <ButtonLink to="/contact" variant="secondary">{h.ctaContact}</ButtonLink>
+              </div>
+            </div>
           </div>
+          <img src={loungeImg} alt="City Factory space" style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} loading="lazy" />
         </div>
       </section>
-
-      <WaveDivider from="var(--espoo-powder)" to="#ffffff" />
 
       {/* UPCOMING EVENTS */}
       <section className="cf-section" style={{ paddingTop: "2rem" }}>
