@@ -3,7 +3,7 @@ import { useMemo, useState } from "react";
 import "./layout.css";
 import { useLanguage } from "../../state/language";
 import { useTranslation } from "../../i18n/useTranslation";
-import espooLogo from "../../utils/espoo logo.png";
+import espooLogo from "../../utils/espoo_logo.png";
 
 function GlobeIcon() {
   return (
