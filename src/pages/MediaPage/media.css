@@ -15,15 +15,15 @@
   background: var(--espoo-blue);
   color: #fff;
   padding: 1rem 1.5rem;
-  text-align: center;
+  text-align: left;
   flex-shrink: 0;
 }
 
 .cf-voicemap-page__title {
-  font-size: 1.25rem;
-  font-weight: 800;
+  font-size: 1.15rem;
+  font-weight: 600;
   margin: 0;
-  letter-spacing: -0.02em;
+  letter-spacing: -0.01em;
 }
 
 .cf-voicemap-page__subtitle {
@@ -31,8 +31,6 @@
   margin: 0.25rem 0 0;
   opacity: 0.85;
   max-width: 60ch;
-  margin-left: auto;
-  margin-right: auto;
 }
 
 .cf-voicemap-page__mock-badge {

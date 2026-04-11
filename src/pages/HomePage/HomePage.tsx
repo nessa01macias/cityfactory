@@ -66,6 +66,44 @@ export function HomePage() {
 
   return (
     <>
+      {/* SURVEY BANNER — right below navbar */}
+      <section style={{
+        background: "linear-gradient(135deg, var(--espoo-berry), #e53e6b)",
+        padding: "1rem 0",
+        position: "relative",
+        overflow: "hidden",
+        zIndex: 10,
+      }}>
+        <div aria-hidden="true" style={{ position: "absolute", inset: 0, pointerEvents: "none" }}>
+          <div style={{ position: "absolute", width: 120, height: 120, top: "-30%", left: "5%", borderRadius: "50%", background: "rgba(255,255,255,0.08)" }} />
+          <div style={{ position: "absolute", width: 80, height: 80, bottom: "-20%", right: "8%", borderRadius: "50%", background: "rgba(255,255,255,0.06)" }} />
+        </div>
+        <div className="cf-container" style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "1.25rem", flexWrap: "wrap", position: "relative", zIndex: 1, textAlign: "center" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: "0.6rem" }}>
+            <span style={{ fontSize: "1.6rem" }} aria-hidden="true">&#128227;</span>
+            <span style={{ color: "#fff", fontWeight: 800, fontSize: "1.1rem", letterSpacing: "-0.01em" }}>
+              We need your input! Fill in our quick survey
+            </span>
+          </div>
+          <a
+            href="https://form.typeform.com/to/AMsMgNmi"
+            target="_blank"
+            rel="noreferrer"
+            className="cf-btn cf-btn--white cf-btn--lg"
+            style={{
+              fontWeight: 800,
+              fontSize: "1rem",
+              padding: "0.7rem 2rem",
+              borderRadius: "var(--cf-radius-full)",
+              boxShadow: "0 2px 12px rgba(0,0,0,0.15)",
+              animation: "cf-pulse 2s ease-in-out infinite",
+            }}
+          >
+            Take the survey &rarr;
+          </a>
+        </div>
+      </section>
+
       {/* HERO */}
       <section className="cf-hero cf-hero--home">
         <HeroDecorations />

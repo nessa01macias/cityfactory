@@ -7,6 +7,8 @@ import {
   fetchAllPins,
   insertPin,
   subscribeToPins,
+  votePin,
+  hasVoted,
   type MapPin,
   type PinCategory,
 } from "../../storage/mapPins";
@@ -208,13 +210,47 @@ export function CommunityMap() {
                       {categoryLabel(pin.category as PinCategory)}
                     </span>
                     <p className="cf-map-popup__message">{pin.message}</p>
-                    <span className="cf-map-popup__date">
-                      {new Date(pin.created_at).toLocaleDateString(dateLocale, {
-                        day: "numeric",
-                        month: "short",
-                        year: "numeric",
-                      })}
-                    </span>
+                    <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginTop: "0.35rem" }}>
+                      <span className="cf-map-popup__date">
+                        {new Date(pin.created_at).toLocaleDateString(dateLocale, {
+                          day: "numeric",
+                          month: "short",
+                          year: "numeric",
+                        })}
+                      </span>
+                      <button
+                        type="button"
+                        onClick={async () => {
+                          const newVotes = await votePin(pin.id);
+                          if (newVotes !== null) {
+                            setPins((prev) => prev.map((p) => p.id === pin.id ? { ...p, votes: newVotes } : p));
+                          }
+                        }}
+                        disabled={hasVoted(pin.id)}
+                        style={{
+                          appearance: "none",
+                          border: "1px solid var(--cf-border)",
+                          borderRadius: "999px",
+                          background: hasVoted(pin.id) ? "var(--cf-surface)" : "#fff",
+                          padding: "0.2rem 0.6rem",
+                          cursor: hasVoted(pin.id) ? "default" : "pointer",
+                          display: "inline-flex",
+                          alignItems: "center",
+                          gap: "0.3rem",
+                          fontSize: "0.8rem",
+                          fontWeight: 600,
+                          color: hasVoted(pin.id) ? "var(--cf-primary)" : "var(--cf-text-secondary)",
+                          transition: "all 0.15s",
+                        }}
+                      >
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+                          <path d="M12 4l2.5 5.5L20 10l-4 4 1 5.5L12 17l-5 2.5 1-5.5-4-4 5.5-.5z"
+                            fill={hasVoted(pin.id) ? "currentColor" : "none"}
+                            stroke="currentColor" strokeWidth="1.5" />
+                        </svg>
+                        {pin.votes ?? 0}
+                      </button>
+                    </div>
                   </div>
                 </Popup>
               </Marker>
