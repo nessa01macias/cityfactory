@@ -5,6 +5,7 @@ import { ButtonLink } from "../../components/ui/Button";
 import { fetchUpcomingEvents, eventPath, preferredText, eventCity, CITY_LABELS, type LinkedEvent, type CityFilter } from "../../api/linkedEvents";
 import { formatDateTime, truncate } from "../../utils/format";
 import { useTranslation } from "../../i18n/useTranslation";
+import brochureImg from "../../utils/BrochurePicture_Sponsor_TeamName.png";
 import "../page.css";
 
 const CITY_OPTIONS: CityFilter[] = ["all", "espoo", "helsinki", "vantaa"];
@@ -16,7 +17,7 @@ export function EventsPage() {
   const [events, setEvents] = useState<LinkedEvent[] | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [query, setQuery] = useState("");
-  const [cityFilter, setCityFilter] = useState<CityFilter>("all");
+  const [cityFilter, setCityFilter] = useState<CityFilter>("espoo");
 
   useEffect(() => {
     const ac = new AbortController();
@@ -48,44 +49,138 @@ export function EventsPage() {
         <div className="cf-container cf-hero__inner">
           <h1 className="cf-h1">{te.title}</h1>
           <p className="cf-lead">{te.lead}</p>
+        </div>
+      </section>
 
-          <div style={{ marginTop: "1rem", display: "flex", flexWrap: "wrap", gap: "0.5rem", alignItems: "center" }}>
-            {CITY_OPTIONS.map((city) => (
-              <button
-                key={city}
-                onClick={() => setCityFilter(city)}
-                style={{
-                  padding: "0.5rem 1.1rem",
-                  borderRadius: "var(--cf-radius-full)",
-                  border: "1px solid rgba(255,255,255,0.25)",
-                  background: cityFilter === city ? "#fff" : "rgba(255,255,255,0.1)",
-                  color: cityFilter === city ? "var(--espoo-night)" : "#fff",
-                  fontWeight: 600,
-                  fontSize: "0.9rem",
-                  cursor: "pointer",
-                  transition: "all 0.15s ease",
-                }}
-              >
-                {CITY_LABELS[city]}
-              </button>
-            ))}
-          </div>
-
-          <div style={{ marginTop: "0.75rem", maxWidth: "480px" }}>
-            <input
-              className="cf-input"
-              id="search"
-              value={query}
-              onChange={(e) => setQuery(e.target.value)}
-              placeholder={te.searchPlaceholder}
-              style={{ background: "rgba(255,255,255,0.15)", borderColor: "rgba(255,255,255,0.25)", color: "#fff", padding: "0.8rem 1rem", fontSize: "1rem" }}
+      {/* ── Featured Event: PDP Gala ── */}
+      <section className="cf-section" style={{ paddingBottom: "1.5rem" }}>
+        <div className="cf-container">
+          <div className="cf-split" style={{
+            border: "1px solid var(--cf-border-light)",
+            boxShadow: "var(--cf-shadow)",
+          }}>
+            <img
+              src={brochureImg}
+              alt="Product Development Gala 2026"
+              style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }}
             />
+            <div style={{ padding: "2rem", display: "flex", flexDirection: "column", justifyContent: "center" }}>
+              <div style={{ display: "flex", gap: "0.4rem", marginBottom: "0.75rem" }}>
+                <Badge tone="espoo">City Factory</Badge>
+                <span style={{
+                  padding: "0.2rem 0.6rem",
+                  borderRadius: "999px",
+                  background: "var(--espoo-sunflower)",
+                  color: "#333",
+                  fontSize: "0.75rem",
+                  fontWeight: 600,
+                }}>
+                  Featured
+                </span>
+              </div>
+              <h2 style={{ fontSize: "1.3rem", fontWeight: 600, margin: "0 0 0.4rem" }}>
+                Product Development Gala 2026
+              </h2>
+              <div style={{ fontSize: "0.85rem", color: "var(--cf-text-muted)", marginBottom: "0.6rem" }}>
+                8 May 2026, 09:00–17:00 · Design Factory, Puumiehenkuja 5A, Espoo
+              </div>
+              <p style={{ margin: "0 0 1rem", fontSize: "0.9rem", color: "var(--cf-text-secondary)", lineHeight: 1.6 }}>
+                Celebrating 30 years of interdisciplinary innovation. 22 student teams showcase functional prototypes tackling real-world challenges — from ship bridges to hospital ICUs. Free entry, no registration needed.
+              </p>
+              <div style={{ display: "flex", gap: "0.5rem", flexWrap: "wrap" }}>
+                <a
+                  href="https://www.aalto.fi/en/events/product-development-gala-2026"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="cf-btn"
+                >
+                  Event details →
+                </a>
+                <ButtonLink to="/contact" variant="secondary">
+                  {te.contactUs}
+                </ButtonLink>
+              </div>
+            </div>
           </div>
         </div>
       </section>
 
-      <section className="cf-section">
+      {/* ── Host an event CTA ── */}
+      <section style={{ paddingBottom: "1.5rem" }}>
         <div className="cf-container">
+          <Card className="cf-card--blue">
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: "1rem" }}>
+              <div>
+                <div className="cf-card__title">{te.hostTitle}</div>
+                <p className="cf-card__meta" style={{ margin: 0 }}>{te.hostDesc}</p>
+              </div>
+              <ButtonLink to="/contact">{te.contactUs}</ButtonLink>
+            </div>
+          </Card>
+        </div>
+      </section>
+
+      {/* ── All events ── */}
+      <section className="cf-section" style={{ paddingTop: "1.5rem" }}>
+        <div className="cf-container">
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: "0.5rem", marginBottom: "0.5rem" }}>
+            <h2 className="cf-h2" style={{ margin: 0 }}>Events nearby</h2>
+            <a
+              href="https://www.espoo.fi/en/events-espoo"
+              target="_blank"
+              rel="noreferrer"
+              style={{ fontSize: "0.85rem", fontWeight: 500 }}
+            >
+              See all Espoo events on espoo.fi →
+            </a>
+          </div>
+
+          {/* Filter bar */}
+          <div style={{
+            display: "flex",
+            flexWrap: "wrap",
+            gap: "0.75rem",
+            alignItems: "center",
+            marginBottom: "1.5rem",
+            padding: "0.75rem 1rem",
+            background: "var(--cf-surface)",
+            borderRadius: "12px",
+            border: "1px solid var(--cf-border-light)",
+          }}>
+            <div style={{ display: "flex", gap: "0.35rem", flexWrap: "wrap" }}>
+              {CITY_OPTIONS.map((city) => (
+                <button
+                  key={city}
+                  onClick={() => setCityFilter(city)}
+                  style={{
+                    padding: "0.35rem 0.85rem",
+                    borderRadius: "999px",
+                    border: cityFilter === city ? "1.5px solid var(--cf-primary)" : "1.5px solid var(--cf-border)",
+                    background: cityFilter === city ? "var(--cf-primary-light)" : "#fff",
+                    color: cityFilter === city ? "var(--cf-primary)" : "var(--cf-text-secondary)",
+                    fontWeight: cityFilter === city ? 600 : 400,
+                    fontSize: "0.85rem",
+                    cursor: "pointer",
+                    transition: "all 0.15s",
+                  }}
+                >
+                  {CITY_LABELS[city]}
+                </button>
+              ))}
+            </div>
+
+            <div style={{ flex: 1, minWidth: "200px" }}>
+              <input
+                className="cf-input"
+                id="search"
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+                placeholder={te.searchPlaceholder}
+                style={{ width: "100%", padding: "0.45rem 0.75rem", fontSize: "0.85rem" }}
+              />
+            </div>
+          </div>
+
           {error ? <div className="cf-alert cf-alert--error">{error}</div> : null}
 
           <div className="cf-grid cf-grid--2">
@@ -116,12 +211,11 @@ export function EventsPage() {
                   </div>
                   <div className="cf-card__meta">{when} &middot; {where}</div>
                   {desc ? <p style={{ margin: "0.25rem 0 0.75rem", color: "var(--cf-text-secondary)", fontSize: "0.925rem" }}>{desc}</p> : null}
-                  <div className="cf-actions" style={{ marginTop: 0 }}>
-                    <ButtonLink to={eventPath(ev.id)} variant="secondary">{te.viewDetails}</ButtonLink>
-                    {preferredText(ev.info_url) ? (
-                      <a className="cf-btn cf-btn--ghost" href={preferredText(ev.info_url)} target="_blank" rel="noreferrer">{te.externalLink}</a>
-                    ) : null}
-                  </div>
+                  {preferredText(ev.info_url) ? (
+                    <a className="cf-btn cf-btn--secondary" href={preferredText(ev.info_url)} target="_blank" rel="noreferrer" style={{ marginTop: "0.25rem" }}>
+                      {te.viewDetails} →
+                    </a>
+                  ) : null}
                 </Card>
               );
             })}
@@ -130,14 +224,6 @@ export function EventsPage() {
           {filtered && filtered.length === 0 ? (
             <div className="cf-alert cf-alert--info" style={{ marginTop: "1.5rem" }}>{te.noResults}</div>
           ) : null}
-
-          <div style={{ height: "2.5rem" }} />
-
-          <Card className="cf-card--blue">
-            <div className="cf-card__title">{te.hostTitle}</div>
-            <p className="cf-card__meta">{te.hostDesc}</p>
-            <ButtonLink to="/contact">{te.contactUs}</ButtonLink>
-          </Card>
         </div>
       </section>
     </>

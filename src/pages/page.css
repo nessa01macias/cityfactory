@@ -333,8 +333,20 @@
   display: flex;
   align-items: flex-start;
   overflow-x: auto;
-  padding: 0.5rem 0 1rem;
+  padding: 1rem 0 1.25rem;
   position: relative;
+}
+
+/* Horizontal line behind all circles */
+.cf-pipeline::before {
+  content: "";
+  position: absolute;
+  top: 20px;
+  left: calc(100% / 12);
+  right: calc(100% / 12);
+  height: 3px;
+  background: linear-gradient(90deg, var(--cf-border) 0%, var(--cf-primary-light) 50%, var(--cf-border) 100%);
+  border-radius: 2px;
 }
 
 .cf-pipeline__step {
@@ -345,47 +357,117 @@
   min-width: 0;
   position: relative;
   text-align: center;
-}
-
-/* Connecting line between steps */
-.cf-pipeline__step:not(:last-child)::after {
-  content: "";
-  position: absolute;
-  top: 14px;
-  left: calc(50% + 16px);
-  right: calc(-50% + 16px);
-  height: 2px;
-  background: var(--cf-border);
+  gap: 0.5rem;
 }
 
 .cf-pipeline__num {
-  width: 28px;
-  height: 28px;
+  width: 40px;
+  height: 40px;
   border-radius: 50%;
   background: var(--cf-primary);
   color: #fff;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 0.8rem;
-  font-weight: 700;
+  font-size: 0.85rem;
+  font-weight: 600;
   flex-shrink: 0;
   position: relative;
   z-index: 1;
+  transition: all 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+  box-shadow: 0 2px 8px rgba(0, 80, 187, 0.2);
+}
+
+.cf-pipeline__step:hover .cf-pipeline__num {
+  transform: scale(1.12);
+  box-shadow: 0 4px 16px rgba(0, 80, 187, 0.35);
 }
 
 .cf-pipeline__label {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 0.4rem;
-  font-weight: 600;
+  gap: 0.5rem;
+  font-weight: 500;
   font-size: 0.8rem;
   color: var(--cf-text-secondary);
   white-space: nowrap;
+  transition: color 0.2s;
+}
+
+.cf-pipeline__step:hover .cf-pipeline__label {
+  color: var(--cf-text);
 }
 
 .cf-pipeline__arrow { display: none; }
+
+@media (max-width: 768px) {
+  .cf-pipeline {
+    padding: 0.75rem 0 1rem;
+  }
+
+  .cf-pipeline::before {
+    top: 14px;
+  }
+
+  .cf-pipeline__num {
+    width: 28px;
+    height: 28px;
+    font-size: 0.7rem;
+  }
+
+  .cf-pipeline__label {
+    font-size: 0.65rem;
+    white-space: normal;
+    word-break: break-word;
+    gap: 0.3rem;
+  }
+
+  .cf-pipeline__step {
+    gap: 0.3rem;
+  }
+}
+
+/* Info box animation */
+@keyframes cf-fadeSlideUp {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.cf-pipeline-info {
+  animation: cf-fadeSlideUp 0.3s ease-out;
+}
+
+/* ============================================================
+   Split Layouts (responsive two-column → stacked on mobile)
+   ============================================================ */
+
+.cf-split {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  border-radius: 16px;
+  overflow: hidden;
+}
+
+.cf-split--wide-left { grid-template-columns: 1.2fr 1fr; }
+.cf-split--wide-right { grid-template-columns: 1fr 1.2fr; }
+
+@media (max-width: 768px) {
+  .cf-split,
+  .cf-split--wide-left,
+  .cf-split--wide-right {
+    grid-template-columns: 1fr;
+  }
+
+  .cf-split img {
+    max-height: 220px;
+  }
+
+  /* On mobile, reset alternating order so image is always first */
+  .cf-split > * {
+    order: 0 !important;
+  }
+}
 
 /* ============================================================
    Feature List

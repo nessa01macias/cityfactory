@@ -6,9 +6,29 @@
   display: flex;
   flex-direction: column;
   height: calc(100vh - var(--cf-header-height));
-  /* Prevent iOS safari bounce / address bar weirdness */
   height: calc(100dvh - var(--cf-header-height));
   overflow: hidden;
+}
+
+/* Embedded map (inside Get Involved page) */
+.cf-voicemap-embed {
+  height: 70vh;
+  min-height: 450px;
+  position: relative;
+  overflow: hidden;
+  max-width: 100vw;
+}
+
+.cf-voicemap-embed .cf-voicemap {
+  height: 100%;
+  max-width: 100%;
+}
+
+@media (max-width: 768px) {
+  .cf-voicemap-embed {
+    height: 60vh;
+    min-height: 350px;
+  }
 }
 
 .cf-voicemap-page__hero {
@@ -59,8 +79,8 @@
   flex: 1;
   position: relative;
   min-height: 0;
-  /* Ensure map fills on mobile even when panel is open */
   min-width: 0;
+  overflow: hidden;
 }
 
 /* ── Toast notifications ── */
@@ -161,7 +181,7 @@
 
 /* ── Side panel (desktop) ── */
 .cf-voicemap__panel {
-  width: 360px;
+  width: min(360px, 40vw);
   flex-shrink: 0;
   background: #fff;
   border-left: 1px solid var(--cf-border-light);
@@ -398,15 +418,20 @@
     font-size: 0.8rem;
   }
 
-  /* Map always fills the screen */
-  .cf-voicemap {
+  /* Map always fills the screen (standalone mode) */
+  .cf-voicemap-page .cf-voicemap {
     flex-direction: column;
   }
 
-  .cf-voicemap__map {
-    /* Map takes full height always */
+  .cf-voicemap-page .cf-voicemap__map {
     position: absolute;
     inset: 0;
+  }
+
+  /* Embedded mode: map stays in flow */
+  .cf-voicemap-embed .cf-voicemap__map {
+    position: relative;
+    height: 100%;
   }
 
   /* Panel becomes a bottom sheet overlay */
@@ -525,6 +550,9 @@
   }
 
   .cf-voicemap__legend {
-    display: none;
+    font-size: 0.65rem;
+    bottom: 3.5rem;
+    left: 0.5rem;
+    padding: 0.3rem 0.5rem;
   }
 }

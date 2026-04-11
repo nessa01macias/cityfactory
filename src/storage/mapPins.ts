@@ -1,6 +1,6 @@
 import { supabase } from "../supabaseClient";
 
-export type PinCategory = "thought" | "idea" | "issue" | "love" | "memory";
+export type PinCategory = "idea" | "issue" | "recommendation";
 
 export type MapPin = {
   id: string;
