@@ -3,7 +3,7 @@
    ============================================================ */
 
 .cf-hero {
-  padding: 3.5rem 0 3rem;
+  padding: 2.5rem 0 2rem;
   background: var(--espoo-blue);
   color: #fff;
   position: relative;
@@ -22,7 +22,7 @@
 
 /* ── Home hero — extra tall with decorative blobs ── */
 .cf-hero--home {
-  padding: 5rem 0 7rem;
+  padding: 3.5rem 0 4.5rem;
   background: var(--espoo-night);
   background-image:
     radial-gradient(ellipse 80% 60% at 75% 20%, rgba(0, 80, 187, 0.6), transparent),
@@ -32,7 +32,7 @@
 
 @media (min-width: 860px) {
   .cf-hero--home {
-    padding: 6rem 0 9rem;
+    padding: 4rem 0 5rem;
   }
 }
 
